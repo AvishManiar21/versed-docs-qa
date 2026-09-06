@@ -98,6 +98,29 @@ and code quality. Code quality explicitly includes:
   and the `security-review` skill over everything changed, not just the
   automated per-PR checks.
 
+## Ponytail (anti-over-engineering)
+
+The `ponytail` Claude Code plugin is installed and used as follows — each
+skill has one clear point in the process, not a blanket "run everything
+always":
+
+- **`ponytail` (main mode)** — always active during implementation. Every
+  task's code follows its ladder by default: does this need to exist,
+  reuse what's already here, stdlib before custom code, fewest lines that
+  work. No separate invocation needed; it governs how code gets written.
+- **`ponytail-review`** — run as an additional lens at every task-level
+  review and at the final full-scope review, alongside the existing
+  spec/quality and `security-review` passes. Hunts specifically for
+  reinvented stdlib, unneeded dependencies, and speculative abstractions —
+  complements, doesn't replace, correctness-focused review.
+- **`ponytail-audit`** and **`ponytail-debt`** — run together, once per
+  completed plan/milestone (a whole-repo sweep, not diff-scoped, so too
+  coarse for per-task use). `ponytail-audit` finds what to delete or
+  simplify repo-wide; `ponytail-debt` harvests any `ponytail:` shortcut
+  comments left behind so a deliberate simplification gets tracked instead
+  of forgotten.
+- **`ponytail-gain`** and **`ponytail-help`** — on-demand only, when asked.
+
 ## Where does this file go?
 
 If you're adding something and unsure where it belongs, match it to the
