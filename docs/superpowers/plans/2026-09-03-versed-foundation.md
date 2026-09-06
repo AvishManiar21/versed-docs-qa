@@ -53,6 +53,23 @@ Alembic, `pydantic-settings`, `langchain-core`/`langchain-openai`, `typer`,
   → `create_agent` (langchain.agents) rename spans two packages and will not
   appear as a `moved` event until a later plan extends the manifest to also
   introspect `langgraph` per version point.
+- **Deferred production-grade techniques, tracked rather than forgotten.**
+  Not needed at this plan's stage; flagged with the specific point each
+  becomes relevant so a later task doesn't silently skip it:
+  - *Structured logging* — irrelevant while everything is a CLI script.
+    Add when the FastAPI service exists (spec Milestone 8, a later plan),
+    not to this plan's ingestion code.
+  - *Retry logic on external calls* — Task 7's OpenAI embedding calls and
+    Task 9's per-version `pip install` both hit real network services with
+    no retry; `check=True` on subprocess calls means a failure is loud
+    rather than silent, which is the correct default for now, but a
+    transient network blip currently kills the whole ingestion run. When
+    Tasks 7 and 9 are implemented, prefer a library (`tenacity`) over a
+    hand-rolled retry loop, per the library-preference rule above — don't
+    add this preemptively before those tasks exist.
+  - *Full error-handling/observability layer* (typed exceptions,
+    correlation IDs, etc.) — belongs to the service layer once one exists,
+    not this plan's ingestion CLI.
 - Concrete version manifest (verified against the real repos before writing
   this plan — see rationale below):
 
@@ -187,6 +204,76 @@ Expected: `uv sync` creates `.venv/` and `uv.lock` with no errors.
 ```bash
 git add pyproject.toml .env.example .gitignore README.md src tests scripts uv.lock
 git commit -m "chore: scaffold versed project with uv"
+```
+
+---
+
+### Task 1B: Pre-commit hooks
+
+**Files:**
+- Create: `.pre-commit-config.yaml`
+- Modify: `pyproject.toml` (add `pre-commit` to the `dev` dependency group)
+- Modify: `README.md` (document `uv run pre-commit install` as a setup step)
+
+**Interfaces:**
+- Produces: a git pre-commit hook that runs `ruff check --fix` and
+  `ruff format` on staged files, blocking the commit if either finds
+  something it can't auto-fix. Uses the existing `ruff` config in
+  `pyproject.toml` — no separate configuration to maintain.
+
+- [ ] **Step 1: Add `pre-commit` to `pyproject.toml`'s dev group**
+
+```toml
+    "pre-commit>=3.8",
+```
+
+- [ ] **Step 2: Write `.pre-commit-config.yaml`**
+
+```yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+```
+
+- [ ] **Step 3: Install the hook and verify it blocks a real violation**
+
+```bash
+uv sync --all-groups
+uv run pre-commit install
+```
+
+Then introduce a deliberate lint violation (e.g. an unused import) in a
+tracked file, `git add` it, and run `git commit -m "test"`. Expected: the
+commit is blocked or the file is auto-fixed by the hook (ruff's `--fix`
+will silently correct what it can, then the commit re-run succeeds); revert
+the deliberate violation afterward — this is a manual verification step,
+not a permanent test file.
+
+- [ ] **Step 4: Verify a clean run**
+
+```bash
+uv run pre-commit run --all-files
+```
+
+Expected: all hooks pass (exit 0).
+
+- [ ] **Step 5: Add the setup step to README.md**
+
+In the "Get it running" section, after `uv sync`, add:
+
+```
+uv run pre-commit install    # runs ruff automatically on every commit
+```
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add pyproject.toml .pre-commit-config.yaml README.md
+git commit -m "chore: add pre-commit hooks for ruff check and format"
 ```
 
 ---

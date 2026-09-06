@@ -135,6 +135,7 @@ cp .env.example .env
 # edit .env and set OPENAI_API_KEY
 
 uv sync                        # installs dependencies into .venv/
+uv run pre-commit install      # runs ruff automatically on every commit
 docker compose up -d db        # starts Postgres+pgvector on localhost:5433
 uv run alembic upgrade head    # creates the schema
 ```
