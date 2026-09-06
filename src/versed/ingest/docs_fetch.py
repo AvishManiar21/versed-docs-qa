@@ -7,7 +7,7 @@ def fetch_ref(repo_url: str, ref: str, dest: Path) -> None:
     if dest.exists():
         raise FileExistsError(f"{dest} already exists; remove it before fetching")
     subprocess.run(
-        ["git", "clone", "--depth", "1", "--branch", ref, repo_url, str(dest)],
+        ["git", "clone", "--depth", "1", "--branch", ref, "--", repo_url, str(dest)],
         check=True,
         capture_output=True,
         text=True,
