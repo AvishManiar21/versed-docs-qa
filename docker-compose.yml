@@ -1,0 +1,19 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: versed
+      POSTGRES_PASSWORD: versed
+      POSTGRES_DB: versed
+    ports:
+      - "5433:5432"
+    volumes:
+      - versed_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U versed"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  versed_pgdata:
