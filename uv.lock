@@ -1759,7 +1759,7 @@ requires-dist = [
     { name = "langchain-core", specifier = ">=1.0.0" },
     { name = "langchain-ollama", specifier = ">=0.2.0" },
     { name = "pgvector", specifier = ">=0.3.6" },
-    { name = "psycopg", extras = ["binary"], specifier = ">=3.2" },
+    { name = "psycopg", extras = ["binary"], specifier = ">=3.3.5" },
     { name = "pydantic-settings", specifier = ">=2.5" },
     { name = "sqlalchemy", specifier = ">=2.0.35" },
     { name = "tiktoken", specifier = ">=0.8.0" },
