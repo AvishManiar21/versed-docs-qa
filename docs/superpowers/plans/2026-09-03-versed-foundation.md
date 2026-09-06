@@ -2476,6 +2476,90 @@ git commit -m "feat: introspect langchain_classic alongside langchain for accura
 
 ---
 
+### Task 12C: Fix venv recreation for re-runnable build-symbols
+
+**Files:**
+- Modify: `src/versed/ingest/symbol_pipeline.py`
+- Modify: `tests/integration/test_symbol_pipeline.py`
+
+**Interfaces:**
+- No signature changes. `create_isolated_python(venv_dir: Path) -> Path`
+  keeps its exact contract; it just stops failing when `venv_dir` already
+  has content in it.
+- Reason: Task 12B's implementer found that a second `build-symbols` run
+  against a non-empty `.versed-venvs/` cache hard-fails, because `uv venv`
+  refuses to write into an existing directory by default. This matters for
+  the project's incremental-rerun design — `build_manifest()` already
+  re-resolves `latest`/`latest_classic` live from PyPI specifically so
+  `build-symbols` can be re-run as new releases ship, without code
+  changes; a venv-creation failure defeats that unless the cache is
+  manually cleared first every time.
+
+- [ ] **Step 1: Write the failing test**
+
+```python
+# tests/integration/test_symbol_pipeline.py — add to the existing file
+def test_create_isolated_python_succeeds_on_existing_venv_dir(tmp_path):
+    venv_dir = tmp_path / "reused_venv"
+
+    first_python = create_isolated_python(venv_dir)
+    assert first_python.exists()
+
+    # Re-running against the same, now-populated directory must not raise.
+    second_python = create_isolated_python(venv_dir)
+    assert second_python.exists()
+```
+
+(Add `create_isolated_python` to this file's existing import from
+`versed.ingest.symbol_pipeline` if not already imported.)
+
+- [ ] **Step 2: Run test to verify it fails**
+
+Run: `uv run pytest tests/integration/test_symbol_pipeline.py::test_create_isolated_python_succeeds_on_existing_venv_dir -v -m integration`
+Expected: FAIL — `subprocess.CalledProcessError` on the second
+`create_isolated_python` call (`uv venv` refuses to write into the
+already-populated directory).
+
+- [ ] **Step 3: Add `--clear` to the `uv venv` call**
+
+In `src/versed/ingest/symbol_pipeline.py`:
+
+```python
+def create_isolated_python(venv_dir: Path) -> Path:
+    subprocess.run(
+        ["uv", "venv", str(venv_dir), "--python", INTROSPECT_PYTHON, "--clear"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return venv_dir / "bin" / "python"
+```
+
+`--clear` is `uv venv`'s own native flag for exactly this ("Remove any
+existing files or directories at the target path") — not a hand-rolled
+`rm -rf` before the call. Verified this flag is real and does what's
+described via `uv venv --help` before writing this task, not assumed from
+memory.
+
+- [ ] **Step 4: Run test to verify it passes**
+
+Run: `uv run pytest tests/integration/test_symbol_pipeline.py::test_create_isolated_python_succeeds_on_existing_venv_dir -v -m integration`
+Expected: PASS
+
+- [ ] **Step 5: Run the full existing test file to confirm nothing else broke**
+
+Run: `uv run pytest tests/integration/test_symbol_pipeline.py -v -m integration`
+Expected: PASS (all tests, including the pre-existing ones from Tasks 9 and 12B)
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add src/versed/ingest/symbol_pipeline.py tests/integration/test_symbol_pipeline.py
+git commit -m "fix: allow build-symbols to re-run against an existing venv cache"
+```
+
+---
+
 ### Task 13: CI — lint, type-check, unit tests
 
 **Files:**
