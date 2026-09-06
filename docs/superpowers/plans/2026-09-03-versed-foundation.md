@@ -1634,7 +1634,7 @@ def test_build_symbols_for_version_finds_known_deprecated_class(tmp_path):
         retrieval_qa = session.scalars(
             select(Symbol).where(
                 Symbol.version == "0.2",
-                Symbol.qualified_name.like("%RetrievalQA"),
+                Symbol.qualified_name.like("%.RetrievalQA"),
             )
         ).first()
         assert retrieval_qa is not None
