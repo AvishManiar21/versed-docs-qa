@@ -32,6 +32,8 @@ def ingest_docs_for_version(source: VersionSource, session: Session) -> int:
 
         for batch_start in range(0, len(raw_chunks), EMBED_BATCH_SIZE):
             batch = raw_chunks[batch_start : batch_start + EMBED_BATCH_SIZE]
+            # ponytail: no retry on embedding calls, add tenacity if a transient
+            # failure ever kills a real ingestion run
             vectors = embeddings.embed_documents([raw.content for _, raw in batch])
             for (rel_path, raw), vector in zip(batch, vectors):
                 session.add(
