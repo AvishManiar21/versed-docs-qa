@@ -15,8 +15,9 @@ events). A thin Typer CLI drives both and exposes a `timeline <symbol>` query
 — this plan's demo deliverable.
 
 **Tech Stack:** Python 3.12, `uv`, SQLAlchemy 2.0 + `psycopg` v3, `pgvector`,
-Alembic, `pydantic-settings`, `langchain-core`/`langchain-openai`, `typer`,
-`tiktoken`, `httpx`, Postgres 16 + pgvector (Docker), pytest, ruff.
+Alembic, `pydantic-settings`, `langchain-core`/`langchain-ollama`, `typer`,
+`tiktoken`, `httpx`, Postgres 16 + pgvector (Docker), Ollama (local
+embeddings), pytest, ruff.
 
 **Spec:** `docs/superpowers/specs/2026-09-02-version-aware-docs-qa-design.md`
 (covers Milestones 1–2: Corpus, Symbol timeline)
@@ -28,9 +29,14 @@ Alembic, `pydantic-settings`, `langchain-core`/`langchain-openai`, `typer`,
 - `uv` is the only package/venv manager used anywhere in this plan — it
   bundles its own pip and can fetch interpreters, which avoids the
   system-`ensurepip` dependency that plain `venv` has.
-- Embeddings: OpenAI `text-embedding-3-small` (1536 dimensions) via
-  `langchain-openai`. Requires `OPENAI_API_KEY` in the environment for any
-  step that touches `ingest_docs_for_version`.
+- Embeddings: local Ollama `nomic-embed-text` (768 dimensions) via
+  `langchain-ollama`. Requires the Ollama daemon running locally
+  (`systemctl is-active ollama`) with the model pulled
+  (`ollama pull nomic-embed-text`) — no API key, no cost, no external
+  network call for any step that touches `ingest_docs_for_version`. Changed
+  from an earlier OpenAI-based design (see Task 6B) because the user has no
+  OpenAI budget; verified live (not assumed) that the model returns 768-dim
+  vectors before committing to this dimension in the schema.
 - Postgres runs via Docker Compose on host port **5433** (not 5432, to avoid
   clashing with a local Postgres install). `DATABASE_URL` in `.env` points
   there.
@@ -1062,6 +1068,141 @@ git commit -m "feat: add git-ref docs fetcher"
 
 ---
 
+### Task 6B: Switch embeddings to local Ollama
+
+**Files:**
+- Modify: `pyproject.toml` (remove `langchain-openai`, add `langchain-ollama`)
+- Modify: `src/versed/db/models.py` (`EMBEDDING_DIM` 1536 → 768)
+- Modify: `src/versed/config.py` (remove unused `openai_api_key` field)
+- Modify: `.env.example`, `README.md`
+- Create: `migrations/versions/0002_embedding_dim_768.py`
+
+**Interfaces:**
+- Produces: schema and dependencies aligned on `nomic-embed-text`'s real
+  768-dimensional output (verified live against a running Ollama instance
+  before writing this task — not assumed). No interface signatures change;
+  `Chunk.embedding`'s Python type stays `list[float] | None`.
+- Reason for the change: user has no OpenAI budget. Ollama runs locally,
+  free, no API key. Reserving OpenRouter's free-tier chat models for a
+  later plan's LLM/judge needs — a separate decision, not this one.
+
+- [ ] **Step 1: Update `pyproject.toml`**
+
+Remove `"langchain-openai>=1.0.0",` from `dependencies`, add:
+
+```toml
+    "langchain-ollama>=0.2.0",
+```
+
+- [ ] **Step 2: Update `EMBEDDING_DIM` in `src/versed/db/models.py`**
+
+```python
+EMBEDDING_DIM = 768
+```
+
+- [ ] **Step 3: Remove the unused `openai_api_key` field from `src/versed/config.py`**
+
+```python
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    database_url: str = "postgresql+psycopg://versed:versed@localhost:5433/versed"
+    data_dir: str = "data"
+
+
+settings = Settings()
+```
+
+Confirmed safe: no test in `tests/unit/test_config.py` asserts on
+`openai_api_key`.
+
+- [ ] **Step 4: Write `migrations/versions/0002_embedding_dim_768.py`**
+
+```python
+"""embedding dim 1536 -> 768 (switch to local Ollama nomic-embed-text)
+
+Revision ID: 0002
+Revises: 0001
+Create Date: 2026-09-06
+"""
+
+from alembic import op
+
+revision = "0002"
+down_revision = "0001"
+branch_labels = None
+depends_on = None
+
+
+def upgrade() -> None:
+    op.execute("ALTER TABLE chunk ALTER COLUMN embedding TYPE vector(768)")
+
+
+def downgrade() -> None:
+    op.execute("ALTER TABLE chunk ALTER COLUMN embedding TYPE vector(1536)")
+```
+
+Raw SQL, not `op.alter_column`, because pgvector's dimension is a type
+parameter Alembic's generic column-alter helper doesn't model — this is the
+standard way to do it. Safe to run with zero rows in the table (true right
+now); if it's ever run against a populated table, note that a `vector(N)`
+type change is only lossless when every existing value already has exactly
+N dimensions — not a concern yet since nothing has been ingested.
+
+- [ ] **Step 5: Apply the migration and verify**
+
+```bash
+uv sync --all-groups
+docker compose up -d db
+uv run alembic upgrade head
+docker compose exec -T db psql -U versed -d versed -c "\d chunk" | grep embedding
+```
+
+Expected: shows `embedding | vector(768)`, and `uv run alembic current`
+reports `0002 (head)`.
+
+- [ ] **Step 6: Update `.env.example`**
+
+```
+DATABASE_URL=postgresql+psycopg://versed:versed@localhost:5433/versed
+```
+
+(Drop the `OPENAI_API_KEY` line entirely — nothing in this plan needs it.)
+
+- [ ] **Step 7: Update `README.md`**
+
+In the prerequisites table, replace the "An OpenAI API key" row with:
+
+| **[Ollama](https://ollama.com)** | local embeddings (`nomic-embed-text`) | `curl -fsSL https://ollama.com/install.sh \| sh` then `ollama pull nomic-embed-text` |
+
+In "Get it running", remove the `cp .env.example .env` comment line
+referencing `OPENAI_API_KEY` (the `cp` command itself stays; only the
+comment about what to fill in changes, since there's nothing left to fill
+in for a local Postgres+Ollama setup — delete the comment line entirely).
+
+- [ ] **Step 8: Verify everything still passes**
+
+```bash
+uv run pytest tests/unit -v
+uv run ruff check .
+uv run ruff format --check .
+```
+
+Expected: all green. `tests/unit/test_config.py` still passes with the
+`openai_api_key` field removed (it was never asserted on).
+
+- [ ] **Step 9: Commit**
+
+```bash
+git add pyproject.toml src/versed/db/models.py src/versed/config.py .env.example README.md migrations/versions/0002_embedding_dim_768.py
+git commit -m "feat: switch embeddings to local Ollama (nomic-embed-text, 768-dim)"
+```
+
+---
+
 ### Task 7: Docs ingestion pipeline
 
 **Files:**
@@ -1081,7 +1222,7 @@ git commit -m "feat: add git-ref docs fetcher"
 import tempfile
 from pathlib import Path
 
-from langchain_openai import OpenAIEmbeddings
+from langchain_ollama import OllamaEmbeddings
 from sqlalchemy.orm import Session
 
 from versed.db.models import Chunk
@@ -1095,7 +1236,7 @@ EMBED_BATCH_SIZE = 100
 
 def ingest_docs_for_version(source: VersionSource, session: Session) -> int:
     """Fetch, chunk, embed, and persist one version's docs. Returns chunk count."""
-    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+    embeddings = OllamaEmbeddings(model="nomic-embed-text")
 
     with tempfile.TemporaryDirectory() as tmp:
         dest = Path(tmp) / "repo"
@@ -1131,7 +1272,7 @@ def ingest_docs_for_version(source: VersionSource, session: Session) -> int:
         return len(raw_chunks)
 ```
 
-- [ ] **Step 2: Write the integration test (real network + real OpenAI key required)**
+- [ ] **Step 2: Write the integration test (real network to GitHub for the git clone + a running local Ollama daemon for embeddings — no OpenAI key needed)**
 
 ```python
 # tests/integration/test_docs_pipeline.py
@@ -1166,7 +1307,7 @@ def test_ingest_docs_for_version_persists_chunks():
         assert all(c.embedding is not None for c in stored)
 ```
 
-- [ ] **Step 3: Run it (requires `docker compose up -d db`, `OPENAI_API_KEY` set, network)**
+- [ ] **Step 3: Run it (requires `docker compose up -d db`, Ollama daemon running with `nomic-embed-text` pulled, network to GitHub)**
 
 Run: `uv run pytest tests/integration/test_docs_pipeline.py -v -m integration`
 Expected: PASS — prints a nonzero chunk count for the real 0.1.0 docs checkout
@@ -2032,10 +2173,12 @@ git commit -m "feat: add CLI (ingest-docs, build-symbols, build-timeline, timeli
 **Interfaces:**
 - Produces: a GitHub Actions workflow with three jobs (lint, typecheck,
   test) running on every push to `main` and every PR — not integration/slow
-  tests, which need Postgres, `OPENAI_API_KEY`, and real network installs,
-  and stay out of scope for this plan's CI (the full eval-gating CI belongs
-  to the Evaluation plan). Separate jobs, not one script, so a failure names
-  its category in the PR checks list rather than requiring a log read.
+  tests, which need Postgres, a running Ollama daemon with `nomic-embed-text`
+  pulled, and real network installs, none of which a hosted GitHub Actions
+  runner has by default, and stay out of scope for this plan's CI (the full
+  eval-gating CI belongs to the Evaluation plan). Separate jobs, not one
+  script, so a failure names its category in the PR checks list rather than
+  requiring a log read.
 - Uses libraries instead of hand-rolled checks wherever one exists: `ruff`
   for both lint and format (one tool, two modes, instead of separate
   lint/format tools), `mypy` for types, `astral-sh/setup-uv` (official
