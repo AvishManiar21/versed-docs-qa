@@ -39,6 +39,15 @@ Alembic, `pydantic-settings`, `langchain-core`/`langchain-openai`, `typer`,
   target LangChain version installed, not this project's own dependencies.
   This is load-bearing: any edit that adds a `versed.*` import to that file
   will break every version's introspection.
+- **Prefer a library over hand-rolled code whenever one genuinely fits.**
+  Every task review checks this explicitly, not just correctness — e.g. use
+  `tiktoken` rather than a hand-rolled token estimator (already done),
+  `httpx` rather than raw `urllib` (already done), `pip-audit`/CodeQL rather
+  than writing vulnerability detection (Task 14), `ruff format` rather than
+  a bespoke style checker. The one deliberate exception is
+  `scripts/introspect_worker.py` (Task 8): it must stay stdlib-only by
+  design, since it runs inside an isolated venv that only has the target
+  library installed — a library dependency there would defeat the point.
 - **Known scope limit (carried forward, not hidden):** this plan introspects
   only the `langchain` package. The `create_react_agent` (langgraph.prebuilt)
   → `create_agent` (langchain.agents) rename spans two packages and will not
@@ -1926,18 +1935,60 @@ git commit -m "feat: add CLI (ingest-docs, build-symbols, build-timeline, timeli
 
 ---
 
-### Task 13: CI
+### Task 13: CI — lint, type-check, unit tests
 
 **Files:**
 - Create: `.github/workflows/ci.yml`
+- Modify: `pyproject.toml` (add `mypy` to the dev dependency group, add
+  `[tool.mypy]` config)
 
 **Interfaces:**
-- Produces: a GitHub Actions workflow running lint + unit tests (not
-  integration/slow — those need Postgres, `OPENAI_API_KEY`, and real network
-  installs, and are out of scope for this plan's CI; the full eval-gating CI
-  belongs to the Evaluation plan).
+- Produces: a GitHub Actions workflow with three jobs (lint, typecheck,
+  test) running on every push to `main` and every PR — not integration/slow
+  tests, which need Postgres, `OPENAI_API_KEY`, and real network installs,
+  and stay out of scope for this plan's CI (the full eval-gating CI belongs
+  to the Evaluation plan). Separate jobs, not one script, so a failure names
+  its category in the PR checks list rather than requiring a log read.
+- Uses libraries instead of hand-rolled checks wherever one exists: `ruff`
+  for both lint and format (one tool, two modes, instead of separate
+  lint/format tools), `mypy` for types, `astral-sh/setup-uv` (official
+  action) for toolchain setup — no custom install scripts.
 
-- [ ] **Step 1: Write `.github/workflows/ci.yml`**
+- [ ] **Step 1: Add mypy and its config to `pyproject.toml`**
+
+Add to the `dev` dependency group:
+
+```toml
+    "mypy>=1.11",
+```
+
+Add a new top-level table:
+
+```toml
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+```
+
+`ignore_missing_imports = true` is deliberate, not a placeholder relaxation:
+several dependencies in this project (e.g. early-stage libraries without
+published type stubs) may lack types, and failing CI on a third-party
+library's missing stubs is a false positive this project doesn't own. Types
+in `src/versed` itself are still fully checked.
+
+- [ ] **Step 2: Run mypy locally and fix any real findings**
+
+```bash
+uv sync --all-groups
+uv run mypy src/versed
+```
+
+Expected: exits 0. If it doesn't, fix the flagged `src/versed` code — do not
+loosen `[tool.mypy]` further to silence a real type error.
+
+- [ ] **Step 3: Write `.github/workflows/ci.yml`**
 
 ```yaml
 name: CI
@@ -1948,36 +1999,175 @@ on:
   pull_request:
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - run: uv sync --all-groups
+      - name: Ruff check
+        run: uv run ruff check .
+      - name: Ruff format check
+        run: uv run ruff format --check .
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - run: uv sync --all-groups
+      - name: mypy
+        run: uv run mypy src/versed
+
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-      - name: Install dependencies
-        run: uv sync --all-groups
-      - name: Lint
-        run: uv run ruff check .
+      - uses: astral-sh/setup-uv@v3
+      - run: uv sync --all-groups
       - name: Unit tests
         run: uv run pytest tests/unit -v
+
+  dependency-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - name: pip-audit (dependency vulnerability scan)
+        run: uvx pip-audit --strict
 ```
 
-- [ ] **Step 2: Verify locally**
+`dependency-audit` runs `pip-audit` via `uvx` (uv's ephemeral tool runner) —
+no dependency added to the project itself for a tool only CI needs.
+`--strict` fails the job on any known vulnerability rather than only
+warning, matching this plan's general stance that a check which never fails
+isn't a gate.
+
+- [ ] **Step 4: Verify every job locally before pushing**
 
 ```bash
 uv run ruff check .
+uv run ruff format --check .
+uv run mypy src/versed
 uv run pytest tests/unit -v
+uvx pip-audit --strict
 ```
 
-Expected: ruff reports no errors; all unit tests (chunker, text-features,
-manifest, docs_fetch, diff, introspect_worker, config) pass.
+Expected: all five succeed. If `ruff format --check` fails, run
+`uv run ruff format .` once to fix formatting, then re-verify.
 
-- [ ] **Step 3: Commit and push**
+- [ ] **Step 5: Commit and push**
 
 ```bash
-git add .github/workflows/ci.yml
-git commit -m "ci: run lint and unit tests on push and PR"
+git add pyproject.toml .github/workflows/ci.yml
+git commit -m "ci: add lint, format check, type check, unit tests, and dependency audit"
 ```
+
+---
+
+### Task 14: Security scanning and dependency updates
+
+**Files:**
+- Create: `.github/workflows/codeql.yml`
+- Create: `.github/dependabot.yml`
+
+**Interfaces:**
+- Produces: automated SAST (CodeQL) on every push/PR and weekly on a
+  schedule, plus automated dependency-update PRs (uv-managed Python deps and
+  GitHub Actions versions). Both are GitHub-native services configured via
+  files, not custom code — the whole point of this task is using existing
+  infrastructure instead of writing a vulnerability scanner or an update bot.
+- This task is independent of Task 13 (no shared files) — it can be done in
+  either order relative to it.
+
+- [ ] **Step 1: Write `.github/workflows/codeql.yml`**
+
+```yaml
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 3 * * 1"
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    strategy:
+      matrix:
+        language: ["python"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+      - uses: github/codeql-action/analyze@v3
+```
+
+The weekly cron (Monday 03:17 UTC — an off-peak, non-round time to avoid
+GitHub's documented top-of-hour scheduling congestion) catches vulnerable
+patterns in code that hasn't changed recently but where CodeQL's own rule
+set has been updated since the last push.
+
+- [ ] **Step 2: Write `.github/dependabot.yml`**
+
+```yaml
+version: 2
+updates:
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+```
+
+The `uv` ecosystem (not `pip`) is used deliberately — Dependabot's native uv
+support understands `uv.lock` directly. Known rough edge as of this writing:
+some reports of Dependabot updating `uv.lock` without updating the matching
+`pyproject.toml` line, or vice versa. When the first Dependabot PR lands,
+verify both files changed together before merging; if only one did, that's
+a real Dependabot bug to work around (e.g. by re-running `uv lock` locally
+on that PR's branch), not a config error in this file.
+
+- [ ] **Step 3: Verify the YAML is well-formed**
+
+```bash
+python3 -c "import yaml; yaml.safe_load(open('.github/workflows/codeql.yml'))"
+python3 -c "import yaml; yaml.safe_load(open('.github/dependabot.yml'))"
+```
+
+Expected: both exit 0 with no output (valid YAML). This does not verify
+GitHub accepts the semantics — that's confirmed after push in Step 5.
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add .github/workflows/codeql.yml .github/dependabot.yml
+git commit -m "ci: add CodeQL security scanning and Dependabot updates"
+```
+
+- [ ] **Step 5: Push and confirm both are live**
+
+```bash
+git push
+gh workflow list
+```
+
+Expected: `CodeQL` appears in the workflow list and its first run completes
+(check via `gh run list --workflow=codeql.yml`). Dependabot's first scan is
+not immediate — confirm it under the repo's Insights → Dependency graph →
+Dependabot tab within the following day, or via
+`gh api repos/:owner/:repo/dependabot/alerts` once available.
 
 ---
 
@@ -1990,3 +2180,26 @@ this plan produces. Extending symbol introspection to also cover `langgraph`
 (to capture the `create_react_agent` → `create_agent` cross-package move) is
 a small, well-contained follow-up to `manifest.py` and `symbol_pipeline.py`
 once this plan is merged — flagged here rather than silently assumed away.
+
+Task 13/14's CI is deliberately scoped to what a project this size needs now
+(lint, format, types, unit tests, dependency audit, CodeQL, Dependabot) —
+not a full DevSecOps platform. Out of scope here, revisit once the service
+is deployed (Milestone 8): container image scanning (e.g. Trivy) once a
+Dockerfile exists, required branch-protection status checks (set once the
+job names in Task 13/14 are stable and have run green at least once — a
+protection rule pointed at a check that has never reported blocks every
+merge), and SAST beyond CodeQL's default query set.
+
+## Final review for this plan
+
+Once all 14 tasks are merged to `main`, this plan's whole-branch-equivalent
+review (per superpowers:subagent-driven-development's Final Review step,
+adapted for this project's per-task-PR workflow to mean "review the full
+set of changes since this plan started") runs two passes, not one:
+`superpowers:requesting-code-review`'s code-reviewer for correctness and the
+library-reuse/simplification criterion above, and the `security-review`
+skill for anything CodeQL's default queries don't catch (secrets, injection
+surfaces, trust boundaries specific to this project's design — e.g. the
+`introspect_worker.py` subprocess boundary, the git-ref fetcher's use of
+user-influenced version strings). Findings from either pass are ledgered and
+fixed the same way as a task-level finding.
