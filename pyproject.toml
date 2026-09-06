@@ -35,7 +35,7 @@ packages = ["src/versed"]
 testpaths = ["tests"]
 markers = [
     "integration: requires a running Postgres (docker compose up -d db)",
-    "slow: hits the network (git clone, pip install, OpenAI embeddings)",
+    "slow: hits the network (git clone, pip install, Ollama embeddings)",
 ]
 
 [tool.ruff]

@@ -167,7 +167,8 @@ uv run pytest tests/integration -v -m integration   # needs `docker compose up -
 ```
 
 Some integration tests are also marked `slow` (they hit the real network —
-git clones, pip installs, OpenAI calls). Run everything, slow included, with:
+git clones, pip installs, Ollama embedding calls). Run everything, slow
+included, with:
 
 ```bash
 uv run pytest tests/integration -v -m integration
