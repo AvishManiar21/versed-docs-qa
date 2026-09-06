@@ -9,3 +9,4 @@ __pycache__/
 .coverage
 htmlcov/
 requirements.txt
+.superpowers/sdd/
