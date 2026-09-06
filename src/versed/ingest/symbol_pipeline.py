@@ -13,7 +13,7 @@ INTROSPECT_PYTHON = "3.11"
 
 def create_isolated_python(venv_dir: Path) -> Path:
     subprocess.run(
-        ["uv", "venv", str(venv_dir), "--python", INTROSPECT_PYTHON, "--clear"],
+        ["uv", "venv", str(venv_dir), "--python", INTROSPECT_PYTHON, "--allow-existing"],
         check=True,
         capture_output=True,
         text=True,
