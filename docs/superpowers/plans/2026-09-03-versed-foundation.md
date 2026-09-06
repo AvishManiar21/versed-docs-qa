@@ -58,7 +58,19 @@ embeddings), pytest, ruff.
   only the `langchain` package. The `create_react_agent` (langgraph.prebuilt)
   → `create_agent` (langchain.agents) rename spans two packages and will not
   appear as a `moved` event until a later plan extends the manifest to also
-  introspect `langgraph` per version point.
+  introspect `langgraph` per version point. **Second, independent reason
+  that specific rename still wouldn't surface as `moved` even after that
+  extension:** Task 10's move-pairing heuristic matches a removed and an
+  added symbol only on exact short-name equality (`create_react_agent` !=
+  `create_agent` — the name itself changed, not just the module path). It
+  would correctly surface as a separate `removed` + `added` pair instead —
+  accurate, just not merged into one `moved` event. The heuristic is
+  intentionally this simple (no fuzzy/similarity matching) per the
+  library-preference and YAGNI rules below; Task 10's own test uses a
+  genuine LangChain example where the short name IS preserved
+  (`ContextualCompressionRetriever` moving from `langchain.retrievers` to
+  `langchain_classic.retrievers.contextual_compression` in the 1.0
+  migration) to test the mechanism correctly.
 - **Deferred production-grade techniques, tracked rather than forgotten.**
   Not needed at this plan's stage; flagged with the specific point each
   becomes relevant so a later task doesn't silently skip it:
@@ -1723,14 +1735,16 @@ def test_detects_changed_signature():
 
 
 def test_pairs_rename_into_single_moved_event():
-    before = {"langgraph.prebuilt.create_react_agent": row("langgraph.prebuilt.create_react_agent")}
-    after = {"langchain.agents.create_agent": row("langchain.agents.create_agent")}
+    old_name = "langchain.retrievers.ContextualCompressionRetriever"
+    new_name = "langchain_classic.retrievers.contextual_compression.ContextualCompressionRetriever"
+    before = {old_name: row(old_name)}
+    after = {new_name: row(new_name)}
     events = diff_versions("0.3", before, "1.0", after)
     assert len(events) == 1
     assert events[0].event_type == "moved"
-    assert events[0].qualified_name == "langchain.agents.create_agent"
-    assert "create_react_agent" in events[0].detail
-    assert "create_agent" in events[0].detail
+    assert events[0].qualified_name == new_name
+    assert old_name in events[0].detail
+    assert new_name in events[0].detail
 
 
 def test_unchanged_symbol_produces_no_event():
