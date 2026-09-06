@@ -77,7 +77,7 @@ belongs.
 | **[uv](https://docs.astral.sh/uv/)** | dependency & venv management (also fetches Python 3.11 for the isolated introspection venvs) | see OS instructions below |
 | **Docker** | runs Postgres + pgvector locally | see OS instructions below |
 | **git** | version control | usually preinstalled |
-| **An OpenAI API key** | embeddings | [platform.openai.com](https://platform.openai.com/api-keys) |
+| **[Ollama](https://ollama.com)** | local embeddings (`nomic-embed-text`) | `curl -fsSL https://ollama.com/install.sh \| sh` then `ollama pull nomic-embed-text` |
 
 <details>
 <summary><b>macOS</b></summary>
@@ -132,7 +132,6 @@ git clone https://github.com/AvishManiar21/versed-docs-qa.git
 cd versed-docs-qa
 
 cp .env.example .env
-# edit .env and set OPENAI_API_KEY
 
 uv sync                        # installs dependencies into .venv/
 uv run pre-commit install      # runs ruff automatically on every commit

@@ -5,7 +5,6 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     database_url: str = "postgresql+psycopg://versed:versed@localhost:5433/versed"
-    openai_api_key: str = ""
     data_dir: str = "data"
 
 

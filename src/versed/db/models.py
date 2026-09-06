@@ -5,7 +5,7 @@ from sqlalchemy import Index, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-EMBEDDING_DIM = 1536
+EMBEDDING_DIM = 768
 
 
 class Base(DeclarativeBase):
