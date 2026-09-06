@@ -22,6 +22,8 @@ def create_isolated_python(venv_dir: Path) -> Path:
 
 
 def install_into(python_path: Path, pip_spec: str) -> None:
+    # ponytail: no retry on package install, add tenacity if a transient
+    # failure ever kills a real build-symbols run
     subprocess.run(
         ["uv", "pip", "install", "--python", str(python_path), "--", pip_spec],
         check=True,
