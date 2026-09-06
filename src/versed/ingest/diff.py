@@ -23,6 +23,17 @@ def _short_name(qualified_name: str) -> str:
     return qualified_name.rsplit(".", 1)[-1]
 
 
+def _move_key(qualified_name: str, kind: str) -> str:
+    """Key used only for move-pairing. Methods compare on `Class.method`
+    (the last two dot-separated segments) so unrelated methods of the same
+    name on unrelated classes don't collide; everything else compares on
+    the last segment, as before.
+    """
+    if kind == "method":
+        return ".".join(qualified_name.rsplit(".", 2)[-2:])
+    return _short_name(qualified_name)
+
+
 def diff_versions(
     from_version: str,
     from_symbols: dict[str, SymbolRow],
@@ -35,17 +46,26 @@ def diff_versions(
     added_names = set(to_symbols) - set(from_symbols)
     common_names = set(from_symbols) & set(to_symbols)
 
-    removed_by_short: dict[str, list[str]] = {}
+    removed_by_key: dict[tuple[str, str], list[str]] = {}
     for name in removed_names:
-        removed_by_short.setdefault(_short_name(name), []).append(name)
+        kind = from_symbols[name].kind
+        removed_by_key.setdefault((kind, _move_key(name, kind)), []).append(name)
+
+    added_by_key: dict[tuple[str, str], list[str]] = {}
+    for name in added_names:
+        kind = to_symbols[name].kind
+        added_by_key.setdefault((kind, _move_key(name, kind)), []).append(name)
 
     matched_added: set[str] = set()
     matched_removed: set[str] = set()
     moved_pairs: list[tuple[str, str]] = []
     for added_name in sorted(added_names):
-        candidates = removed_by_short.get(_short_name(added_name), [])
-        if len(candidates) == 1:
-            old_name = candidates[0]
+        kind = to_symbols[added_name].kind
+        key = (kind, _move_key(added_name, kind))
+        removed_candidates = removed_by_key.get(key, [])
+        added_candidates = added_by_key.get(key, [])
+        if len(removed_candidates) == 1 and len(added_candidates) == 1:
+            old_name = removed_candidates[0]
             moved_pairs.append((old_name, added_name))
             matched_added.add(added_name)
             matched_removed.add(old_name)

@@ -86,15 +86,22 @@ def walk_public_symbols(package_name):
                         continue
                     _emit(f"{module.__name__}.{member_name}.{method_name}", "method", method)
 
+    skipped = []
     if hasattr(package, "__path__"):
         prefix = package.__name__ + "."
         for _, name, _ in pkgutil.walk_packages(package.__path__, prefix=prefix):
             try:
                 module = importlib.import_module(name)
             except Exception:
+                skipped.append(name)
                 continue
             visit_module(module)
     visit_module(package)
+
+    if skipped:
+        print(f"skipped {len(skipped)} modules: {skipped}", file=sys.stderr)
+
+    return len(skipped)
 
 
 if __name__ == "__main__":
