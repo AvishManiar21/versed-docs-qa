@@ -4,7 +4,7 @@ from sqlalchemy import select
 from versed.db.models import Symbol
 from versed.db.session import get_session
 from versed.ingest.manifest import VersionSource
-from versed.ingest.symbol_pipeline import build_symbols_for_version
+from versed.ingest.symbol_pipeline import build_symbols_for_version, create_isolated_python
 
 pytestmark = [pytest.mark.integration, pytest.mark.slow]
 
@@ -64,3 +64,14 @@ def test_build_symbols_for_version_installs_extra_packages(tmp_path):
         ).all()
         assert len(langchain_symbols) > 0
         assert len(classic_symbols) > 0
+
+
+def test_create_isolated_python_succeeds_on_existing_venv_dir(tmp_path):
+    venv_dir = tmp_path / "reused_venv"
+
+    first_python = create_isolated_python(venv_dir)
+    assert first_python.exists()
+
+    # Re-running against the same, now-populated directory must not raise.
+    second_python = create_isolated_python(venv_dir)
+    assert second_python.exists()
