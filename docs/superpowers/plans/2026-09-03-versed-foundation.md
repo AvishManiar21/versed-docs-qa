@@ -2730,11 +2730,19 @@ jobs:
         language: ["python"]
     steps:
       - uses: actions/checkout@v4
-      - uses: github/codeql-action/init@v3
+      - uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
-      - uses: github/codeql-action/analyze@v3
+      - uses: github/codeql-action/analyze@v4
 ```
+
+Pinned to v4, not v3: GitHub's own runner output on this task's first real
+run flagged that CodeQL Action v3 is deprecated in December 2026 — since
+this is a brand-new workflow with no legacy v3 usage to migrate, there's
+no reason to start on the version already scheduled for deprecation.
+Verified `v4` is a real, published tag (not just announced) before
+switching, via the GitHub API, not assumed from the deprecation notice
+alone.
 
 The weekly cron (Monday 03:17 UTC — an off-peak, non-round time to avoid
 GitHub's documented top-of-hour scheduling congestion) catches vulnerable
