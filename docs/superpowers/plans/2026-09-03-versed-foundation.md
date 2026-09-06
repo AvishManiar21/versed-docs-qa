@@ -2182,6 +2182,296 @@ git commit -m "feat: add CLI (ingest-docs, build-symbols, build-timeline, timeli
 
 ---
 
+### Task 12B: Introspect langchain_classic for accurate move detection
+
+**Files:**
+- Modify: `src/versed/ingest/manifest.py`
+- Modify: `src/versed/ingest/symbol_pipeline.py`
+- Modify: `tests/unit/test_manifest.py`
+- Modify: `tests/integration/test_symbol_pipeline.py`
+
+**Interfaces:**
+- Produces: `VersionSource` gains an `extra_pip_specs: list[str]` field
+  (default empty). `build_symbols_for_version` installs and introspects
+  each entry in `extra_pip_specs` into the SAME isolated venv as the main
+  `pip_spec`, persisting all resulting symbols under the same `version`.
+- Reason for this task: the real pipeline run (Task 12) surfaced that
+  `langchain`'s current version has only ~340 symbols vs ~7500 for v0.3 —
+  verified real, not a bug (LangChain 1.0 moved most legacy code to a
+  separate `langchain_classic` package). Since only `langchain` itself is
+  introspected, a symbol that moved to `langchain_classic` currently shows
+  as a bare `removed` event — true, but not as useful as `moved`, which
+  Task 10's existing move-pairing logic would produce automatically if it
+  could see the symbol on both sides. No changes to `diff.py` are needed —
+  only to what gets introspected.
+- **Verified before writing this task, not assumed:** `langchain-classic`
+  does NOT share `langchain`'s version number (checked live via PyPI:
+  `langchain-classic` was at `1.0.8` while `langchain` was at `1.4.0`), so
+  it must be resolved independently, not reused from the already-resolved
+  `latest` value.
+
+- [ ] **Step 1: Add a reusable PyPI-version resolver to `manifest.py`, and the new field**
+
+Modify `src/versed/ingest/manifest.py`:
+
+```python
+from dataclasses import dataclass, field
+
+import httpx
+
+
+@dataclass(frozen=True)
+class VersionSource:
+    version: str
+    repo_url: str
+    ref: str
+    docs_subpath: str
+    pip_spec: str
+    extra_pip_specs: list[str] = field(default_factory=list)
+
+
+def resolve_latest_pypi_version(package: str) -> str:
+    response = httpx.get(f"https://pypi.org/pypi/{package}/json", timeout=10.0)
+    response.raise_for_status()
+    return response.json()["info"]["version"]
+
+
+def resolve_latest_langchain_version() -> str:
+    return resolve_latest_pypi_version("langchain")
+```
+
+`resolve_latest_langchain_version()` keeps its exact existing signature and
+behavior (still no-arg, still resolves `langchain` specifically) so nothing
+that already calls it needs to change — it's now a one-line wrapper around
+the new, reusable, package-parameterized function.
+
+- [ ] **Step 2: Populate `extra_pip_specs` for the current version only**
+
+In `build_manifest()`, add one line resolving `langchain-classic`'s own
+latest version, and add `extra_pip_specs` to the `latest` `VersionSource`
+entry only — 0.1/0.2/0.3 get no extra packages, since `langchain_classic`
+did not exist as a separate package before LangChain 1.0:
+
+```python
+def build_manifest() -> list[VersionSource]:
+    latest = resolve_latest_langchain_version()
+    latest_classic = resolve_latest_pypi_version("langchain-classic")
+    langchain_repo = "https://github.com/langchain-ai/langchain.git"
+    return [
+        VersionSource(
+            version="0.1",
+            repo_url=langchain_repo,
+            ref="v0.1.0",
+            docs_subpath="docs/docs",
+            pip_spec="langchain==0.1.0",
+        ),
+        VersionSource(
+            version="0.2",
+            repo_url=langchain_repo,
+            ref="langchain==0.2.0",
+            docs_subpath="docs/docs",
+            pip_spec="langchain==0.2.0",
+        ),
+        VersionSource(
+            version="0.3",
+            repo_url=langchain_repo,
+            ref="langchain==0.3.0",
+            docs_subpath="docs/docs",
+            pip_spec="langchain==0.3.0",
+        ),
+        VersionSource(
+            version=latest,
+            repo_url="https://github.com/langchain-ai/docs.git",
+            ref="main",
+            docs_subpath="src/oss/python",
+            pip_spec=f"langchain=={latest}",
+            extra_pip_specs=[f"langchain-classic=={latest_classic}"],
+        ),
+    ]
+```
+
+- [ ] **Step 3: Update `tests/unit/test_manifest.py` with a URL-aware fake**
+
+The existing fake response returns the same version regardless of which
+package was requested — too weak to prove `langchain-classic` is resolved
+independently. Replace it with one that branches on the request URL:
+
+```python
+# tests/unit/test_manifest.py
+import httpx
+
+from versed.ingest.manifest import build_manifest, resolve_latest_langchain_version
+
+
+class _FakeResponse:
+    def __init__(self, version: str):
+        self._version = version
+
+    def raise_for_status(self):
+        pass
+
+    def json(self):
+        return {"info": {"version": self._version}}
+
+
+def _fake_get(url, *a, **k):
+    if "langchain-classic" in url:
+        return _FakeResponse("1.0.8")
+    return _FakeResponse("1.9.9")
+
+
+def test_resolve_latest_langchain_version(monkeypatch):
+    monkeypatch.setattr(httpx, "get", _fake_get)
+    assert resolve_latest_langchain_version() == "1.9.9"
+
+
+def test_build_manifest_has_four_versions(monkeypatch):
+    monkeypatch.setattr(httpx, "get", _fake_get)
+    manifest = build_manifest()
+    assert [s.version for s in manifest] == ["0.1", "0.2", "0.3", "1.9.9"]
+    assert manifest[0].ref == "v0.1.0"
+    assert manifest[2].ref == "langchain==0.3.0"
+    assert manifest[3].repo_url == "https://github.com/langchain-ai/docs.git"
+    assert manifest[3].pip_spec == "langchain==1.9.9"
+
+
+def test_only_current_version_has_extra_pip_specs(monkeypatch):
+    monkeypatch.setattr(httpx, "get", _fake_get)
+    manifest = build_manifest()
+    assert manifest[0].extra_pip_specs == []
+    assert manifest[1].extra_pip_specs == []
+    assert manifest[2].extra_pip_specs == []
+    assert manifest[3].extra_pip_specs == ["langchain-classic==1.0.8"]
+```
+
+This replaces the two existing test functions with the same names (updated
+to use `_fake_get`) plus one new test — a net one-function addition.
+
+- [ ] **Step 4: Run test to verify it passes**
+
+Run: `uv run pytest tests/unit/test_manifest.py -v`
+Expected: PASS (3 tests)
+
+- [ ] **Step 5: Extend `symbol_pipeline.py` to install and introspect extra packages**
+
+Modify `src/versed/ingest/symbol_pipeline.py`:
+
+```python
+def _pip_spec_to_import_name(pip_spec: str) -> str:
+    return pip_spec.split("==")[0].replace("-", "_")
+
+
+def build_symbols_for_version(source: VersionSource, venv_root: Path, session: Session) -> int:
+    venv_dir = venv_root / source.version.replace(".", "_")
+    python_path = create_isolated_python(venv_dir)
+    install_into(python_path, source.pip_spec)
+
+    records = run_introspection(python_path, _pip_spec_to_import_name(source.pip_spec))
+
+    for extra_spec in source.extra_pip_specs:
+        install_into(python_path, extra_spec)
+        records.extend(run_introspection(python_path, _pip_spec_to_import_name(extra_spec)))
+
+    session.query(Symbol).filter_by(version=source.version).delete()
+    for record in records:
+        session.add(
+            Symbol(
+                version=source.version,
+                qualified_name=record["qualified_name"],
+                kind=record["kind"],
+                signature=record["signature"],
+                docstring=record["docstring"] or None,
+                deprecated_since=record["deprecated_since"],
+                alternative=record["alternative"],
+            )
+        )
+    session.commit()
+    return len(records)
+```
+
+`_pip_spec_to_import_name` replaces the old inline
+`source.pip_spec.split("==")[0]` — same result for `"langchain"` (no
+hyphen, no behavior change), but now also correct for hyphenated pip names
+like `langchain-classic` (pip name) vs `langchain_classic` (import name),
+which the old inline version would have gotten wrong.
+
+- [ ] **Step 6: Add an integration test proving both packages get introspected**
+
+```python
+# tests/integration/test_symbol_pipeline.py — add this test to the existing file
+def test_build_symbols_for_version_installs_extra_packages(tmp_path):
+    source = VersionSource(
+        version="1.0.8-classic-test",
+        repo_url="https://github.com/langchain-ai/langchain.git",
+        ref="langchain==1.0.0",
+        docs_subpath="docs/docs",
+        pip_spec="langchain==1.0.0",
+        extra_pip_specs=["langchain-classic==1.0.8"],
+    )
+    with get_session() as session:
+        session.query(Symbol).filter_by(version="1.0.8-classic-test").delete()
+        session.commit()
+
+        count = build_symbols_for_version(source, tmp_path / "venvs", session)
+        assert count > 0
+
+        langchain_symbols = session.scalars(
+            select(Symbol).where(
+                Symbol.version == "1.0.8-classic-test",
+                Symbol.qualified_name.like("langchain.%"),
+            )
+        ).all()
+        classic_symbols = session.scalars(
+            select(Symbol).where(
+                Symbol.version == "1.0.8-classic-test",
+                Symbol.qualified_name.like("langchain_classic.%"),
+            )
+        ).all()
+        assert len(langchain_symbols) > 0
+        assert len(classic_symbols) > 0
+```
+
+(Add the `get_session` import if not already present in this test file —
+it already imports it for the existing test in this file.)
+
+- [ ] **Step 7: Run it**
+
+Run: `uv run pytest tests/integration/test_symbol_pipeline.py -v -m integration`
+Expected: PASS (both tests — the existing one and the new one)
+
+- [ ] **Step 8: Verify the actual fix live — re-run the real pipeline for the current version and confirm a real relocation now resolves to `moved`**
+
+```bash
+uv run python -m versed.cli build-symbols
+uv run python -m versed.cli build-timeline
+uv run python -m versed.cli timeline ContextualCompressionRetriever
+```
+
+Expected: a `moved` line appears for `ContextualCompressionRetriever`
+(confirmed in Task 10's review to genuinely exist at both
+`langchain.retrievers.ContextualCompressionRetriever` in 0.3 and
+`langchain_classic.retrievers.contextual_compression.ContextualCompressionRetriever`
+in current) — where before this task it would have shown as a bare
+`removed` event with no counterpart. Record the actual output; don't
+assume it matches this description exactly without checking.
+
+- [ ] **Step 9: Update the Global Constraints note this task addresses**
+
+In the plan's Global Constraints, the "Known scope limit" bullet currently
+says relocated symbols "will not appear as a `moved` event." Add a short
+note that this is now resolved for `langchain` → `langchain_classic`
+relocations specifically (this task), while the separate `langgraph` cross
+-package case remains open (a different package, not addressed here).
+
+- [ ] **Step 10: Commit**
+
+```bash
+git add src/versed/ingest/manifest.py src/versed/ingest/symbol_pipeline.py tests/unit/test_manifest.py tests/integration/test_symbol_pipeline.py docs/superpowers/plans/2026-09-03-versed-foundation.md
+git commit -m "feat: introspect langchain_classic alongside langchain for accurate move detection"
+```
+
+---
+
 ### Task 13: CI — lint, type-check, unit tests
 
 **Files:**
