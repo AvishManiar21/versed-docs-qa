@@ -1979,7 +1979,12 @@ def test_build_timeline_across_three_synthetic_versions():
         session.commit()
 
         total = build_timeline(["t1", "t2", "t3"], session)
-        assert total == 2
+        # t1->t2: 1 "deprecated" event (pkg.old_fn gains deprecated_since).
+        # t2->t3: 2 events, NOT 1 "moved" — "old_fn" and "new_fn" have
+        # different short names, so Task 10's exact-short-name move-pairing
+        # correctly does not merge them; it's "removed" pkg.old_fn +
+        # "added" pkg.new_fn. Total: 3.
+        assert total == 3
 
         events = session.scalars(
             select(SymbolEvent).where(SymbolEvent.qualified_name.like("%old_fn%"))
