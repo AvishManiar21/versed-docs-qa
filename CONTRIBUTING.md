@@ -75,6 +75,29 @@ something the plan didn't script, use a Conventional Commits–style prefix:
 `feat/`/`fix/` prefixes — the issue number is the identifier that matters
 here.
 
+## Quality bar
+
+Every task review checks two things beyond "does it work": spec compliance
+and code quality. Code quality explicitly includes:
+
+- **Prefer a library over hand-rolled code whenever one genuinely fits** —
+  don't write what `tiktoken`, `httpx`, `pip-audit`, CodeQL, or `ruff format`
+  already do correctly. The one deliberate exception is
+  `scripts/introspect_worker.py`, which must stay stdlib-only by design (see
+  the plan's Global Constraints).
+- **Automated security and dependency scanning runs in CI on every PR** —
+  CodeQL (SAST), `pip-audit` (known-vulnerability scan), and Dependabot
+  (automated update PRs for Python deps and GitHub Actions versions). See
+  `.github/workflows/codeql.yml`, `.github/workflows/ci.yml`, and
+  `.github/dependabot.yml`.
+- **This is in addition to, not instead of, human/subagent review** — CI
+  catches known vulnerability patterns and stale dependencies; it does not
+  catch design-level issues like trust-boundary mistakes or a task
+  contradicting an already-committed file. Once this plan's tasks are all
+  merged, a full-scope review runs both `superpowers:requesting-code-review`
+  and the `security-review` skill over everything changed, not just the
+  automated per-PR checks.
+
 ## Where does this file go?
 
 If you're adding something and unsure where it belongs, match it to the
