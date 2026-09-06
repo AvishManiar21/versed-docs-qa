@@ -40,13 +40,20 @@ def run_introspection(python_path: Path, package_name: str) -> list[dict]:
     return [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
 
 
+def _pip_spec_to_import_name(pip_spec: str) -> str:
+    return pip_spec.split("==")[0].replace("-", "_")
+
+
 def build_symbols_for_version(source: VersionSource, venv_root: Path, session: Session) -> int:
     venv_dir = venv_root / source.version.replace(".", "_")
     python_path = create_isolated_python(venv_dir)
     install_into(python_path, source.pip_spec)
 
-    package_name = source.pip_spec.split("==")[0]
-    records = run_introspection(python_path, package_name)
+    records = run_introspection(python_path, _pip_spec_to_import_name(source.pip_spec))
+
+    for extra_spec in source.extra_pip_specs:
+        install_into(python_path, extra_spec)
+        records.extend(run_introspection(python_path, _pip_spec_to_import_name(extra_spec)))
 
     session.query(Symbol).filter_by(version=source.version).delete()
     for record in records:

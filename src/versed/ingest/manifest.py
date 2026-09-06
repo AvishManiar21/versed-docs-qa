@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import httpx
 
@@ -10,16 +10,22 @@ class VersionSource:
     ref: str
     docs_subpath: str
     pip_spec: str
+    extra_pip_specs: list[str] = field(default_factory=list)
 
 
-def resolve_latest_langchain_version() -> str:
-    response = httpx.get("https://pypi.org/pypi/langchain/json", timeout=10.0)
+def resolve_latest_pypi_version(package: str) -> str:
+    response = httpx.get(f"https://pypi.org/pypi/{package}/json", timeout=10.0)
     response.raise_for_status()
     return response.json()["info"]["version"]
 
 
+def resolve_latest_langchain_version() -> str:
+    return resolve_latest_pypi_version("langchain")
+
+
 def build_manifest() -> list[VersionSource]:
     latest = resolve_latest_langchain_version()
+    latest_classic = resolve_latest_pypi_version("langchain-classic")
     langchain_repo = "https://github.com/langchain-ai/langchain.git"
     return [
         VersionSource(
@@ -49,5 +55,6 @@ def build_manifest() -> list[VersionSource]:
             ref="main",
             docs_subpath="src/oss/python",
             pip_spec=f"langchain=={latest}",
+            extra_pip_specs=[f"langchain-classic=={latest_classic}"],
         ),
     ]

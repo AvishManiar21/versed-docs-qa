@@ -55,7 +55,11 @@ embeddings), pytest, ruff.
   design, since it runs inside an isolated venv that only has the target
   library installed — a library dependency there would defeat the point.
 - **Known scope limit (carried forward, not hidden):** this plan introspects
-  only the `langchain` package. The `create_react_agent` (langgraph.prebuilt)
+  only the `langchain` package — **update (Task 12B): the current version now
+  also introspects `langchain-classic`, so `langchain` → `langchain_classic`
+  relocations (e.g. `ContextualCompressionRetriever`) now correctly surface
+  as a `moved` event instead of a bare `removed` one.** The
+  `create_react_agent` (langgraph.prebuilt)
   → `create_agent` (langchain.agents) rename spans two packages and will not
   appear as a `moved` event until a later plan extends the manifest to also
   introspect `langgraph` per version point. **Second, independent reason
