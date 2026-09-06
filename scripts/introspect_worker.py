@@ -5,6 +5,11 @@ STDLIB ONLY — no third-party imports. This script runs inside an isolated
 per-version venv that has ONLY the target library installed, never this
 project's own dependencies.
 
+Trust boundary: the venv isolates *dependencies*, not *privilege*. Importing
+a package executes that package's code with the invoking user's full
+privileges — the same as running any other Python script. Only point this
+at packages you trust.
+
 Usage: python introspect_worker.py <package_name>
 Emits one JSON object per line (JSONL) to stdout.
 """

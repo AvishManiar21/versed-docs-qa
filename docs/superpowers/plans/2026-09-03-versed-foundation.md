@@ -2838,3 +2838,187 @@ surfaces, trust boundaries specific to this project's design — e.g. the
 `introspect_worker.py` subprocess boundary, the git-ref fetcher's use of
 user-influenced version strings). Findings from either pass are ledgered and
 fixed the same way as a task-level finding.
+
+The final review ran on 2026-09-06 (code-reviewer, security-review, and
+ponytail-audit/ponytail-debt, all on the full 0648d90..83751d8 range).
+Findings are grouped into follow-up tasks by theme rather than one task per
+finding, and executed in parallel using isolated git worktrees per group
+(mechanical fixes with no shared state between groups, verified before
+dispatch that any file touched by two groups only overlaps in
+non-conflicting regions).
+
+---
+
+### Task 15: Final-review fixes — security
+
+Addresses: pip-audit scanning the wrong packages (confirmed independently
+by both the code-reviewer and security-review passes — the strongest-signal
+finding of the whole review); Postgres bound to `0.0.0.0` instead of
+loopback when its committed dev credentials are the only real barrier;
+missing `--` before positional args in the two subprocess calls that take a
+value ultimately sourced from an external system (git ref/repo, pip spec) —
+not exploitable today since `manifest.py`'s values are hardcoded literals,
+but the cheap, permanent guard rail against the day that changes; a missing
+`permissions:` block on `ci.yml`; and documenting (not redesigning) the
+introspection worker's real trust boundary, since its own docstring
+currently implies more isolation than a venv actually provides.
+
+- pip-audit: export the real lock file first (`uv export --frozen
+  --all-groups --format requirements-txt --no-emit-project -o
+  requirements.txt`), then `uvx pip-audit --strict -r requirements.txt` —
+  verified locally before writing this: the old command audited 28
+  packages (its own ephemeral `uvx` environment), the fixed command audits
+  the real 73.
+- `docker-compose.yml`: `"5433:5432"` → `"127.0.0.1:5433:5432"`.
+- `src/versed/ingest/docs_fetch.py`: add `--` before `repo_url` in the
+  `git clone` argv list. Verified working via a real local clone before
+  writing this task (`git clone --depth 1 --branch <ref> -- <repo> <dest>`
+  succeeds).
+- `src/versed/ingest/symbol_pipeline.py`'s `install_into`: add `--` before
+  `pip_spec` in the `uv pip install` argv list. Verified working via a real
+  install before writing this task.
+- `.github/workflows/ci.yml`: add a top-level `permissions: contents: read`
+  block.
+- `scripts/introspect_worker.py`: update the module docstring to state the
+  real trust boundary plainly — importing a package executes that
+  package's code with the invoking user's full privileges; the isolated
+  venv separates *dependencies*, not *privilege*. Only point this at
+  packages you trust.
+
+Verification: `uvx pip-audit --strict -r requirements.txt` output lists
+real project package names (not just `pip-audit` itself); `docker compose
+up -d db` then `docker compose port db 5432` shows `127.0.0.1:5433`; the
+existing `tests/unit/test_docs_fetch.py` and
+`tests/integration/test_symbol_pipeline.py` suites still pass with the `--`
+change (proves the separator didn't break normal operation); `uv run
+pytest tests/unit -v` and `uv run ruff check .` / `format --check .` pass.
+
+---
+
+### Task 16: Final-review fixes — symbol timeline correctness
+
+Addresses two demonstrated-reproducible bugs in `diff.py`'s move-pairing
+(the mechanism behind the project's headline "moved" events) and the
+introspection worker's silent failure mode.
+
+- **One-to-many move pairing**: `removed_by_short` only checks the removed
+  side has exactly one candidate; the added side is unchecked and
+  `matched_removed` doesn't prevent a second pairing. Fix: also build
+  `added_by_short`, and only pair when BOTH sides have exactly one
+  candidate for that short name. Add a test reproducing the exact
+  finding: `before={'a.Foo'}`, `after={'b.Foo','c.Foo'}` must NOT produce
+  two `moved` events (one of `b.Foo`/`c.Foo` should be a plain `added`
+  event instead, and `a.Foo` moved to only the other).
+- **Method short-name collision across unrelated classes**: `_short_name`
+  on `module.Class.method` is just `"method"`, so unrelated methods named
+  the same thing on unrelated classes pair as a false "moved" event. Fix:
+  require `before.kind == after.kind` AND, when `kind == "method"`, compare
+  the last TWO dot-separated segments (`Class.method`) instead of one, in
+  the move-pairing step only (not the existing added/removed/changed
+  logic, which already works correctly on full qualified names). Add a
+  test reproducing the exact finding: `before={'x.Alpha.invoke'}`,
+  `after={'y.Beta.invoke'}` must NOT produce a `moved` event.
+- **Silent import failures in `introspect_worker.py`**: `except Exception:
+  continue` in the module-walk loop currently has zero signal. Fix: count
+  skipped modules and print `f"skipped {n} modules: {names}"` to **stderr**
+  (stdout is the JSONL channel, must stay clean) at the end of
+  `walk_public_symbols`. Surface the count in `build_symbols_for_version`'s
+  return value or echo so a partial introspection is visible, not
+  plausible-looking.
+
+Verification: new unit tests in `tests/unit/test_diff.py` reproducing both
+scenarios above, both passing; existing `tests/unit/test_diff.py` (6
+original tests) still pass unchanged; `tests/unit/test_introspect_worker.py`
+extended to confirm a deliberately-broken fake submodule is counted and
+reported, not silently dropped; `uv run pytest tests/unit -v` and lint/format
+pass.
+
+---
+
+### Task 17: Final-review fixes — venv cache re-runnability
+
+Addresses: Task 12C's own fix (`uv venv --clear`) defeats the incremental-
+rerun goal it was written for — `--clear` destroys and fully reinstalls
+the venv on every run, so `.versed-venvs/` caches nothing. `uv venv
+--allow-existing` ("Preserve any existing files or directories at the
+target path") is the flag that actually matches the stated intent, with
+`uv pip install` then being a fast near-no-op for an already-satisfied
+spec. Verified via `uv venv --help` before writing this task (same source
+Task 12C itself verified `--clear` against).
+
+- `src/versed/ingest/symbol_pipeline.py`'s `create_isolated_python`:
+  replace `--clear` with `--allow-existing`.
+- Update the regression test from Task 12C
+  (`test_create_isolated_python_succeeds_on_existing_venv_dir`) — it should
+  still pass unchanged, since the fix under test is "succeeds when called
+  twice against the same directory," which `--allow-existing` satisfies
+  just as well as `--clear` did, for a different (correct) reason.
+
+**Deferred, not in this task — flagged for a real follow-up, not rushed
+here:** the final review also found that (a) several integration tests
+issue unscoped `DELETE`s against whichever database `DATABASE_URL` points
+at, which is the same database the CLI's real pipeline output lives in —
+needs a dedicated test-database story (a second docker-compose service or
+a `versed_test` database), a genuine infrastructure decision, not a
+one-line fix; (b) CI's unit-test job never exercises any DB-backed module,
+even though three of the five integration tests need only Postgres (not
+Ollama or network) and could run in CI with a service container — needs
+someone to verify which specific tests are genuinely Postgres-only first;
+(c) `build_manifest()` re-resolves "latest" independently on every CLI
+invocation, so a release published mid-pipeline could skew chunks/symbols/
+timeline to different actual versions — the real fix (resolve once,
+persist, add a `--refresh` or `--version` flag) is a small design decision
+that deserves its own attention rather than being folded into a mechanical
+parallel-fix batch.
+
+Verification: `uv run pytest tests/integration/test_symbol_pipeline.py -v
+-m integration` passes (all 3 tests, including the 12C regression test);
+`uv run python -m versed.cli build-symbols` for a single already-cached
+version completes fast (proving the cache is actually reused, not just
+"doesn't error") — record the actual before/after timing difference.
+
+---
+
+### Task 18: Final-review fixes — ponytail cleanup and debt tracking
+
+Addresses the whole-repo ponytail-audit and ponytail-debt findings from the
+completed-plan sweep: unused dependencies, unused generated scaffolding,
+and two real deferred-technique decisions that are documented in this plan
+but carry no marker at their actual code sites (so a future editor of those
+files would never know the missing retry logic is deliberate).
+
+- Remove `langchain-core` and `pytest-cov` from `pyproject.toml`'s
+  dependencies — confirmed zero imports anywhere in `src/`, `scripts/`, or
+  `tests/` by the audit. Regenerate `uv.lock` (`uv sync --all-groups`).
+- Trim `migrations/env.py`'s unused offline-migration code path (Alembic
+  generates both an online and offline mode by default; this project only
+  ever runs online, against a live `DATABASE_URL`) and any unused default
+  config left in `alembic.ini` by `alembic init` that this project doesn't
+  read. Do not remove anything actually referenced by the working
+  migration flow — verify `uv run alembic upgrade head` and `alembic
+  current` still work identically after trimming, not just that the file
+  looks shorter.
+- Add the two debt markers the audit specifically asked for, at the exact
+  code sites the plan's "Deferred production-grade techniques" note
+  describes but doesn't mark:
+  - `src/versed/ingest/docs_pipeline.py` (near the `embed_documents` call):
+    `# ponytail: no retry on embedding calls, add tenacity if a transient
+    failure ever kills a real ingestion run`
+  - `src/versed/ingest/symbol_pipeline.py` (near the `uv pip install`
+    subprocess call): `# ponytail: no retry on package install, add
+    tenacity if a transient failure ever kills a real build-symbols run`
+- Do NOT touch `src/versed/config.py`'s `Settings.data_dir` field — the
+  final review's Task 17 follow-up (deferred, see above) identifies a real
+  future use for it (persisting a resolved "latest" version), so removing
+  it now would just mean re-adding it later.
+- Do NOT change the CI workflow's per-job `uv sync` structure — the audit
+  flagged three independent `uv sync` calls as redundant, but Task 13's
+  own review explicitly praised this structure for naming failures
+  separately in the PR checks list. This is a real, considered tradeoff
+  already made deliberately, not an oversight — leave it as-is.
+
+Verification: `git grep -c 'langchain_core\|langchain-core'` returns zero
+hits outside `uv.lock`/lockfile metadata; `uv run alembic upgrade head`
+against a fresh database still succeeds after the migrations/alembic.ini
+trim; `uv run pytest tests/unit -v` and lint/format still pass; both
+`ponytail:` comments are present at their specified locations.

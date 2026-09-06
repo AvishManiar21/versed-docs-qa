@@ -23,7 +23,7 @@ def create_isolated_python(venv_dir: Path) -> Path:
 
 def install_into(python_path: Path, pip_spec: str) -> None:
     subprocess.run(
-        ["uv", "pip", "install", "--python", str(python_path), pip_spec],
+        ["uv", "pip", "install", "--python", str(python_path), "--", pip_spec],
         check=True,
         capture_output=True,
         text=True,
