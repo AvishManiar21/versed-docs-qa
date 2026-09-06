@@ -44,9 +44,8 @@ for.
 
 6. **Get final approval, then merge via squash merge**, so `main` gets one
    clean commit per task while the branch keeps its granular TDD history for
-   anyone who opens the PR later. Delete the branch after merge (GitHub does
-   this automatically if "Automatically delete head branches" is on, which
-   this repo has enabled).
+   anyone who opens the PR later. Branches are kept after merge, not deleted
+   — the per-task history stays browsable on GitHub.
 
 ## Filing an issue
 
