@@ -52,3 +52,16 @@ class SymbolEvent(Base):
     to_version: Mapped[str] = mapped_column(String(32))
     event_type: Mapped[str] = mapped_column(String(16))
     detail: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+class EvalQuestion(Base):
+    __tablename__ = "eval_question"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    question: Mapped[str] = mapped_column(Text)
+    category: Mapped[str] = mapped_column(String(32))
+    target_version: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    expected_answer: Mapped[str | None] = mapped_column(Text, nullable=True)
+    expected_symbols: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
+    should_abstain: Mapped[bool] = mapped_column(default=False)
+    human_label: Mapped[str | None] = mapped_column(Text, nullable=True)
