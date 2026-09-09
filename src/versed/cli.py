@@ -8,6 +8,7 @@ from versed.ingest.manifest import build_manifest
 from versed.ingest.symbol_pipeline import build_symbols_for_version
 from versed.ingest.symbol_query import symbol_history
 from versed.ingest.timeline_pipeline import build_timeline
+from versed.rag import build_rag_chain
 
 app = typer.Typer()
 
@@ -55,6 +56,12 @@ def timeline_cmd(symbol: str) -> None:
             )
             detail = f" ({event.detail})" if event.detail else ""
             typer.echo(f"[{arrow}] {event.event_type}: {event.qualified_name}{detail}")
+
+
+@app.command("ask")
+def ask_cmd(question: str, k: int = 5) -> None:
+    chain = build_rag_chain(k=k)
+    typer.echo(chain.invoke(question))
 
 
 if __name__ == "__main__":
