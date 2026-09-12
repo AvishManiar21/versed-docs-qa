@@ -21,8 +21,8 @@ phase-by-phase progress and [issues](../../issues) for individual tasks.
 
 | Phase | Status |
 |---|---|
-| 1. Foundation — corpus ingestion & symbol timeline | 🚧 in progress |
-| 2. Baseline RAG & golden eval set | ⬜ not started |
+| 1. Foundation — corpus ingestion & symbol timeline | ✅ done |
+| 2. Baseline RAG & golden eval set | ✅ done |
 | 3. Real system — hybrid retrieval & LangGraph pipeline | ⬜ not started |
 | 4. Evaluation harness & CI quality gate | ⬜ not started |
 | 5. Guardrails & adversarial testing | ⬜ not started |
