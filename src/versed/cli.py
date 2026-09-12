@@ -61,7 +61,7 @@ def timeline_cmd(symbol: str) -> None:
 
 
 @app.command("ask")
-def ask_cmd(question: str, k: int = 5) -> None:
+def ask_cmd(question: str, k: int = typer.Option(5, min=1, max=50)) -> None:
     chain = build_rag_chain(k=k)
     typer.echo(chain.invoke(question))
 

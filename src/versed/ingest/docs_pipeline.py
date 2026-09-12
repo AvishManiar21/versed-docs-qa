@@ -4,6 +4,7 @@ from pathlib import Path
 from langchain_ollama import OllamaEmbeddings
 from sqlalchemy.orm import Session
 
+from versed.config import EMBEDDING_MODEL
 from versed.db.models import Chunk
 from versed.ingest.chunker import chunk_markdown
 from versed.ingest.docs_fetch import fetch_ref, iter_doc_files
@@ -15,7 +16,7 @@ EMBED_BATCH_SIZE = 100
 
 def ingest_docs_for_version(source: VersionSource, session: Session) -> int:
     """Fetch, chunk, embed, and persist one version's docs. Returns chunk count."""
-    embeddings = OllamaEmbeddings(model="nomic-embed-text")
+    embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL)
 
     with tempfile.TemporaryDirectory() as tmp:
         dest = Path(tmp) / "repo"

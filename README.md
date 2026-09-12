@@ -22,7 +22,7 @@ phase-by-phase progress and [issues](../../issues) for individual tasks.
 | Phase | Status |
 |---|---|
 | 1. Foundation — corpus ingestion & symbol timeline | ✅ done |
-| 2. Baseline RAG & golden eval set | ✅ done |
+| 2. Baseline RAG & golden eval set | 🚧 in progress |
 | 3. Real system — hybrid retrieval & LangGraph pipeline | ⬜ not started |
 | 4. Evaluation harness & CI quality gate | ⬜ not started |
 | 5. Guardrails & adversarial testing | ⬜ not started |
@@ -77,7 +77,7 @@ belongs.
 | **[uv](https://docs.astral.sh/uv/)** | dependency & venv management (also fetches Python 3.11 for the isolated introspection venvs) | see OS instructions below |
 | **Docker** | runs Postgres + pgvector locally | see OS instructions below |
 | **git** | version control | usually preinstalled |
-| **[Ollama](https://ollama.com)** | local embeddings (`nomic-embed-text`) | `curl -fsSL https://ollama.com/install.sh \| sh` then `ollama pull nomic-embed-text` |
+| **[Ollama](https://ollama.com)** | local embeddings (`nomic-embed-text`) and the baseline LLM (`phi3.5`) | `curl -fsSL https://ollama.com/install.sh \| sh` then `ollama pull nomic-embed-text` and `ollama pull phi3.5` |
 
 <details>
 <summary><b>macOS</b></summary>
@@ -157,6 +157,15 @@ uv run python -m versed.cli build-timeline
 
 # Ask what changed for a given API
 uv run python -m versed.cli timeline create_agent
+
+# Ask a documentation question via the baseline RAG chain
+uv run python -m versed.cli ask "How do I build an agent in LangChain?"
+
+# Generate a draft golden eval set (writes data/golden_set.yaml, pending human review)
+uv run python -m versed.cli golden-set generate
+
+# Load a hand-reviewed golden set into the eval_question table
+uv run python -m versed.cli golden-set load
 ```
 
 ### Running tests

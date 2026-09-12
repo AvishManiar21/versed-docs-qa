@@ -18,3 +18,6 @@ def test_committed_golden_set_parses_and_has_expected_category_counts():
         "version_implicit": 30,
         "unanswerable": 20,
     }
+
+    question_texts = [q.question for q in questions]
+    assert len(question_texts) == len(set(question_texts))

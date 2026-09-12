@@ -4,6 +4,7 @@ from langchain_core.retrievers import BaseRetriever
 from langchain_ollama import OllamaEmbeddings
 from sqlalchemy import select
 
+from versed.config import EMBEDDING_MODEL
 from versed.db.models import Chunk
 from versed.db.session import get_session
 
@@ -16,12 +17,13 @@ class VersedRetriever(BaseRetriever):
     reranking rather than replacing it.
     """
 
+    # ponytail: no version filter, Milestone 5 adds it
     k: int = 5
 
     def _get_relevant_documents(
         self, query: str, *, run_manager: CallbackManagerForRetrieverRun
     ) -> list[Document]:
-        embeddings = OllamaEmbeddings(model="nomic-embed-text")
+        embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL)
         vector = embeddings.embed_query(query)
         with get_session() as session:
             stmt = select(Chunk).order_by(Chunk.embedding.cosine_distance(vector)).limit(self.k)

@@ -31,3 +31,7 @@ def test_generate_golden_set_produces_150_across_five_categories():
     names = [q.expected_symbols[0] for q in non_abstain]
     assert len(names) == len(set(names))  # no symbol reused across categories
     assert all(name.startswith("langchain") for name in names)
+    assert all(q.expected_answer is not None for q in non_abstain)
+
+    question_texts = [q.question for q in questions]
+    assert len(question_texts) == len(set(question_texts))

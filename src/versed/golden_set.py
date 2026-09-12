@@ -13,6 +13,8 @@ Category = Literal[
     "version_explicit", "version_implicit", "migration", "removed_api", "unanswerable"
 ]
 
+_ID_NAMESPACE = uuid.UUID("6f9c9e5e-1a1b-4c1a-9b1a-1a2b3c4d5e6f")
+
 
 class GoldenQuestion(BaseModel):
     id: uuid.UUID = Field(default_factory=uuid.uuid4)
@@ -29,6 +31,16 @@ class GoldenQuestion(BaseModel):
     def _abstain_has_no_answer(self) -> "GoldenQuestion":
         if self.should_abstain and self.expected_answer is not None:
             raise ValueError("should_abstain rows must not carry an expected_answer")
+        return self
+
+    @model_validator(mode="after")
+    def _stable_id(self) -> "GoldenQuestion":
+        # Deterministic id derived from category+question so regenerating the
+        # golden set from the same underlying data doesn't churn every id —
+        # Milestone 4+ tracks per-question history by id.
+        object.__setattr__(
+            self, "id", uuid.uuid5(_ID_NAMESPACE, f"{self.category}:{self.question}")
+        )
         return self
 
 
@@ -73,6 +85,79 @@ def _short_name(qualified_name: str) -> str:
     return qualified_name.rsplit(".", 1)[-1]
 
 
+_INHERITED_MEMBER_DENYLIST = {
+    "copy",
+    "json",
+    "dict",
+    "model_post_init",
+    "model_copy",
+    "model_dump",
+    "model_dump_json",
+    "model_json_schema",
+    "model_construct",
+    "model_rebuild",
+    "model_validate",
+    "model_validate_json",
+    "model_parametrized_name",
+    "astream_events",
+    "abatch_as_completed",
+    "batch_as_completed",
+    "as_tool",
+    "to_json",
+    "map",
+    "abatch",
+    "assign",
+    "pick",
+    "with_fallbacks",
+    "with_retry",
+    "with_config",
+    "with_types",
+    "get_graph",
+    "get_input_schema",
+    "get_output_schema",
+    "config_schema",
+    "construct",
+    "from_orm",
+    "parse_file",
+    "parse_obj",
+    "parse_raw",
+    "schema",
+    "schema_json",
+    "update_forward_refs",
+    "validate",
+}
+
+
+def _module_of(qualified_name: str) -> str:
+    return qualified_name.rsplit(".", 1)[0]
+
+
+def _diverse_order(events: list[SymbolEvent], used: set[str]) -> list[SymbolEvent]:
+    """Round-robins across modules so a single heavily-churned module (e.g.
+    langchain.agents.agent) can't crowd out every other area of the API when
+    a caller later truncates this list at n. Filters out inherited
+    Pydantic/Runnable member names by short name — those churn on nearly
+    every class due to the Pydantic v1->v2 migration and aren't real,
+    documented LangChain API surface.
+    """
+    by_module: dict[str, list[SymbolEvent]] = {}
+    for event in events:
+        if event.qualified_name in used:
+            continue
+        if _short_name(event.qualified_name) in _INHERITED_MEMBER_DENYLIST:
+            continue
+        by_module.setdefault(_module_of(event.qualified_name), []).append(event)
+
+    ordered: list[SymbolEvent] = []
+    while by_module:
+        for module in list(by_module.keys()):
+            bucket = by_module[module]
+            ordered.append(bucket.pop(0))
+            if not bucket:
+                del by_module[module]
+    return ordered
+
+
 def _find_prior_alternative(qualified_name: str, session: Session) -> str | None:
     """A removed symbol may have been deprecated with a recorded alternative
     at an earlier version transition; diff_versions() never emits a
@@ -107,16 +192,15 @@ def _real_events(
 
 
 def _generate_version_explicit(
-    session: Session, versions: list[str], used: set[str], n: int
+    session: Session, versions: list[str], used: set[str], used_questions: set[str], n: int
 ) -> list[GoldenQuestion]:
-    events = _real_events(session, versions, ["added", "deprecated", "changed", "removed"])
+    events = _diverse_order(
+        _real_events(session, versions, ["added", "deprecated", "changed", "removed"]), used
+    )
     questions: list[GoldenQuestion] = []
     for event in events:
         if len(questions) >= n:
             break
-        if event.qualified_name in used:
-            continue
-        used.add(event.qualified_name)
         short = _short_name(event.qualified_name)
         if event.event_type == "added":
             question = f"Was `{short}` available in LangChain {event.from_version}?"
@@ -148,6 +232,10 @@ def _generate_version_explicit(
                 f"{event.from_version} to {event.to_version}.{tail}"
             )
             target_version = event.to_version
+        if question in used_questions:
+            continue
+        used.add(event.qualified_name)
+        used_questions.add(question)
         questions.append(
             GoldenQuestion(
                 question=question,
@@ -161,27 +249,28 @@ def _generate_version_explicit(
 
 
 def _generate_migration(
-    session: Session, versions: list[str], used: set[str], n: int
+    session: Session, versions: list[str], used: set[str], used_questions: set[str], n: int
 ) -> list[GoldenQuestion]:
-    events = _real_events(session, versions, ["moved", "changed"])
+    events = _diverse_order(_real_events(session, versions, ["moved", "changed"]), used)
     questions: list[GoldenQuestion] = []
     for event in events:
         if len(questions) >= n:
             break
-        if event.qualified_name in used:
-            continue
-        used.add(event.qualified_name)
         short = _short_name(event.qualified_name)
         question = (
             f"I'm upgrading from {event.from_version} to {event.to_version} — "
             f"what changed for `{short}`?"
         )
+        if question in used_questions:
+            continue
+        used.add(event.qualified_name)
+        used_questions.add(question)
         questions.append(
             GoldenQuestion(
                 question=question,
                 category="migration",
                 target_version=event.to_version,
-                expected_answer=event.detail,  # always set for moved/changed, see diff_versions()
+                expected_answer=event.detail,
                 expected_symbols=[event.qualified_name],
             )
         )
@@ -189,17 +278,17 @@ def _generate_migration(
 
 
 def _generate_removed_api(
-    session: Session, versions: list[str], used: set[str], n: int
+    session: Session, versions: list[str], used: set[str], used_questions: set[str], n: int
 ) -> list[GoldenQuestion]:
-    events = _real_events(session, versions, ["removed"])
+    events = _diverse_order(_real_events(session, versions, ["removed"]), used)
     questions: list[GoldenQuestion] = []
     for event in events:
         if len(questions) >= n:
             break
-        if event.qualified_name in used:
-            continue
-        used.add(event.qualified_name)
         short = _short_name(event.qualified_name)
+        question = f"What happened to `{short}`? Can I still use it in {event.to_version}?"
+        if question in used_questions:
+            continue
         replacement = _find_prior_alternative(event.qualified_name, session)
         tail = (
             f" It was previously deprecated with recommended alternative: {replacement}."
@@ -210,9 +299,11 @@ def _generate_removed_api(
             f"`{event.qualified_name}` was removed going from "
             f"{event.from_version} to {event.to_version}.{tail}"
         )
+        used.add(event.qualified_name)
+        used_questions.add(question)
         questions.append(
             GoldenQuestion(
-                question=f"What happened to `{short}`? Can I still use it in {event.to_version}?",
+                question=question,
                 category="removed_api",
                 target_version=event.to_version,
                 expected_answer=answer,
@@ -223,7 +314,7 @@ def _generate_removed_api(
 
 
 def _generate_version_implicit(
-    session: Session, current_version: str, used: set[str], n: int
+    session: Session, current_version: str, used: set[str], used_questions: set[str], n: int
 ) -> list[GoldenQuestion]:
     stmt = (
         select(Symbol)
@@ -233,19 +324,37 @@ def _generate_version_implicit(
         .order_by(Symbol.qualified_name)
     )
     symbols = session.scalars(stmt).all()
-    questions: list[GoldenQuestion] = []
+
+    by_module: dict[str, list[Symbol]] = {}
     for symbol in symbols:
-        if len(questions) >= n:
-            break
         if symbol.qualified_name in used:
             continue
-        used.add(symbol.qualified_name)
+        if _short_name(symbol.qualified_name) in _INHERITED_MEMBER_DENYLIST:
+            continue
+        by_module.setdefault(_module_of(symbol.qualified_name), []).append(symbol)
+    ordered: list[Symbol] = []
+    while by_module:
+        for module in list(by_module.keys()):
+            bucket = by_module[module]
+            ordered.append(bucket.pop(0))
+            if not bucket:
+                del by_module[module]
+
+    questions: list[GoldenQuestion] = []
+    for symbol in ordered:
+        if len(questions) >= n:
+            break
         short = _short_name(symbol.qualified_name)
+        question = f"Does LangChain still have `{short}`?"
+        if question in used_questions:
+            continue
         assert symbol.docstring is not None  # filtered by the query above
         summary = symbol.docstring.strip().splitlines()[0][:200]
+        used.add(symbol.qualified_name)
+        used_questions.add(question)
         questions.append(
             GoldenQuestion(
-                question=f"Does LangChain still have `{short}`?",
+                question=question,
                 category="version_implicit",
                 target_version=current_version,
                 expected_answer=(
@@ -291,11 +400,13 @@ def generate_golden_set(session: Session, versions: list[str]) -> list[GoldenQue
     newest — the last entry is treated as "current" for version_implicit.
     """
     used: set[str] = set()
+    used_questions: set[str] = set()
     current_version = versions[-1]
     questions: list[GoldenQuestion] = []
-    questions += _generate_version_explicit(session, versions, used, n=40)
-    questions += _generate_migration(session, versions, used, n=30)
-    questions += _generate_removed_api(session, versions, used, n=30)
-    questions += _generate_version_implicit(session, current_version, used, n=30)
+    questions += _generate_version_explicit(session, versions, used, used_questions, n=40)
+    questions += _generate_migration(session, versions, used, used_questions, n=30)
+    questions += _generate_removed_api(session, versions, used, used_questions, n=30)
+    questions += _generate_version_implicit(session, current_version, used, used_questions, n=30)
     questions += _generate_unanswerable(session, versions)
+    assert len(questions) == 150, f"golden set generation produced {len(questions)}, expected 150"
     return questions
