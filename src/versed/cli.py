@@ -3,7 +3,7 @@ from pathlib import Path
 import typer
 
 from versed.db.session import get_session
-from versed.golden_set import generate_golden_set, write_golden_set
+from versed.golden_set import generate_golden_set, read_golden_set, write_golden_set
 from versed.golden_set_load import load_golden_set
 from versed.ingest.docs_pipeline import ingest_docs_for_version
 from versed.ingest.manifest import build_manifest
@@ -86,6 +86,52 @@ def golden_set_load_cmd(path: Path = Path("data/golden_set.yaml")) -> None:
     with get_session() as session:
         count = load_golden_set(path, session)
     typer.echo(f"Loaded {count} questions into eval_question")
+
+
+@golden_set_app.command("show")
+def golden_set_show_cmd(identifier: str, path: Path = Path("data/golden_set.yaml")) -> None:
+    """Print one golden-set row plus the real timeline for its symbols, so
+    reviewing a question and checking its evidence doesn't require manually
+    cross-referencing the YAML file against `versed timeline`.
+    """
+    questions = read_golden_set(path)
+
+    match = None
+    if identifier.isdigit() and int(identifier) < len(questions):
+        match = questions[int(identifier)]
+    else:
+        match = next((q for q in questions if str(q.id) == identifier), None)
+    if match is None:
+        typer.echo(f"No question found for '{identifier}' (tried index and id)")
+        raise typer.Exit(code=1)
+
+    typer.echo(f"[{match.category}] {match.question}")
+    if match.target_version:
+        typer.echo(f"target_version: {match.target_version}")
+    if match.should_abstain:
+        typer.echo("expected: should abstain (no ground-truth answer)")
+    else:
+        typer.echo(f"expected_answer: {match.expected_answer}")
+
+    if not match.expected_symbols:
+        typer.echo("(no symbols to check — unanswerable/out-of-scope question)")
+        return
+
+    with get_session() as session:
+        for symbol in match.expected_symbols:
+            suffix = ".".join(symbol.rsplit(".", 2)[-2:]) if symbol.count(".") >= 2 else symbol
+            typer.echo(f"\ntimeline for {symbol}:")
+            events = symbol_history(suffix, session)
+            if not events:
+                typer.echo("  (no history found)")
+            for event in events:
+                arrow = (
+                    f"{event.from_version} -> {event.to_version}"
+                    if event.from_version
+                    else event.to_version
+                )
+                detail = f" ({event.detail})" if event.detail else ""
+                typer.echo(f"  [{arrow}] {event.event_type}: {event.qualified_name}{detail}")
 
 
 if __name__ == "__main__":
