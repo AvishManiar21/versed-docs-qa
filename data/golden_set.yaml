@@ -8,7 +8,7 @@
   expected_symbols:
   - langchain.agents.agent.Agent
   should_abstain: false
-  reviewed: false
+  reviewed: true
   reviewer_note: null
 - id: cbbf9287-2b77-5238-9bab-44f97c6e0237
   question: In version 0.3, does `acall` have the same signature as before?
@@ -106,7 +106,7 @@
   question: In version 0.3, is `create_vectorstore_agent` still recommended for use?
   category: version_explicit
   target_version: '0.3'
-  expected_answer: It's deprecated as of 0.3. No replacement was recorded.
+  expected_answer: It's deprecated as of 0.3. It's now available as `langchain_classic.agents.agent_toolkits.vectorstore.base.create_vectorstore_agent`.
   expected_symbols:
   - langchain.agents.agent_toolkits.vectorstore.base.create_vectorstore_agent
   should_abstain: false
@@ -181,53 +181,41 @@
   should_abstain: false
   reviewed: false
   reviewer_note: null
-- id: 83f2db5a-1e93-5f49-bf52-32f15606009d
-  question: In version 0.3, does `ConversationalAgent` have the same signature as
-    before?
+- id: de209464-c603-51a8-85f4-ca9178b26718
+  question: In version 0.2, is `ConversationalAgent` still recommended for use?
   category: version_explicit
-  target_version: '0.3'
-  expected_answer: 'No — its signature changed in 0.3: (*, llm_chain: langchain.chains.llm.LLMChain,
-    output_parser: langchain.agents.agent.AgentOutputParser = None, allowed_tools:
-    Optional[List[str]] = None, ai_prefix: str = ''AI'') -> None -> (*, llm_chain:
-    langchain.chains.llm.LLMChain, output_parser: langchain.agents.agent.AgentOutputParser
-    = <factory>, allowed_tools: Optional[List[str]] = None, ai_prefix: str = ''AI'')
-    -> None'
+  target_version: '0.2'
+  expected_answer: 'It''s deprecated as of 0.2. Recommended alternative: create_react_agent.'
   expected_symbols:
   - langchain.agents.conversational.base.ConversationalAgent
   should_abstain: false
   reviewed: false
   reviewer_note: null
-- id: 9a5a9601-34fe-5afd-a94e-4342b2c8867a
-  question: In version 0.3, does `ConversationalChatAgent` have the same signature
-    as before?
+- id: fc307a45-c85a-5f53-857f-b24f97033798
+  question: In version 0.2, is `ConversationalChatAgent` still recommended for use?
   category: version_explicit
-  target_version: '0.3'
-  expected_answer: 'No — its signature changed in 0.3: (*, llm_chain: langchain.chains.llm.LLMChain,
-    output_parser: langchain.agents.agent.AgentOutputParser = None, allowed_tools:
-    Optional[List[str]] = None, template_tool_response: str = "TOOL RESPONSE: \n---------------------\n{observation}\n\nUSER''S
-    INPUT\n--------------------\n\nOkay, so what is the response to my last comment?
-    If using information obtained from the tools you must mention it explicitly without
-    mentioning the tool names - I have forgotten all TOOL RESPONSES! Remember to respond
-    with a markdown code snippet of a json blob with a single action, and NOTHING
-    else.") -> None -> (*, llm_chain: langchain.chains.llm.LLMChain, output_parser:
-    langchain.agents.agent.AgentOutputParser = <factory>, allowed_tools: Optional[List[str]]
-    = None, template_tool_response: str = "TOOL RESPONSE: \n---------------------\n{observation}\n\nUSER''S
-    INPUT\n--------------------\n\nOkay, so what is the response to my last comment?
-    If using information obtained from the tools you must mention it explicitly without
-    mentioning the tool names - I have forgotten all TOOL RESPONSES! Remember to respond
-    with a markdown code snippet of a json blob with a single action, and NOTHING
-    else.") -> None'
+  target_version: '0.2'
+  expected_answer: 'It''s deprecated as of 0.2. Recommended alternative: create_json_chat_agent.'
   expected_symbols:
   - langchain.agents.conversational_chat.base.ConversationalChatAgent
   should_abstain: false
   reviewed: false
   reviewer_note: null
-- id: 16db7732-be3b-51eb-a9f1-3617153ff2ec
-  question: Is `ConvoOutputParser` still available in version 1.4.0?
+- id: 15e687d8-2948-5964-9515-cf0ffdda9118
+  question: In version 0.2, does `ConvoOutputParser` have the same signature as before?
   category: version_explicit
-  target_version: 1.4.0
-  expected_answer: No — `langchain.agents.conversational_chat.output_parser.ConvoOutputParser`
-    was removed going from 0.3 to 1.4.0.
+  target_version: '0.2'
+  expected_answer: 'No — its signature changed in 0.2: (*, name: Optional[str] = None)
+    -> None -> (*args: Any, name: Optional[str] = None, format_instructions: str =
+    ''RESPONSE FORMAT INSTRUCTIONS\n----------------------------\n\nWhen responding
+    to me, please output a response in one of two formats:\n\n**Option 1:**\nUse this
+    if you want the human to use a tool.\nMarkdown code snippet formatted in the following
+    schema:\n\n```json\n{{{{\n    "action": string, \\\\ The action to take. Must
+    be one of {tool_names}\n    "action_input": string \\\\ The input to the action\n}}}}\n```\n\n**Option
+    #2:**\nUse this if you want to respond directly to the human. Markdown code snippet
+    formatted in the following schema:\n\n```json\n{{{{\n    "action": "Final Answer",\n    "action_input":
+    string \\\\ You should put what you want to return to use here\n}}}}\n```'') ->
+    None'
   expected_symbols:
   - langchain.agents.conversational_chat.output_parser.ConvoOutputParser
   should_abstain: false
@@ -238,7 +226,7 @@
   category: version_explicit
   target_version: 1.4.0
   expected_answer: No — `langchain.agents.conversational_chat.output_parser.ConvoOutputParser.ainvoke`
-    was removed going from 0.3 to 1.4.0.
+    was removed going from 0.3 to 1.4.0. It's now available as `langchain_classic.evaluation.embedding_distance.base.PairwiseEmbeddingDistanceEvalChain.ainvoke`.
   expected_symbols:
   - langchain.agents.conversational_chat.output_parser.ConvoOutputParser.ainvoke
   should_abstain: false
@@ -289,17 +277,25 @@
   should_abstain: false
   reviewed: false
   reviewer_note: null
-- id: 673bc556-0171-51ed-b950-7b369c3beaa2
-  question: In version 0.2, does `create_json_chat_agent` have the same signature
+- id: 8cfb5f4f-a74d-5b5a-bc8e-ab65d95bd244
+  question: In version 0.3, does `create_json_chat_agent` have the same signature
     as before?
   category: version_explicit
-  target_version: '0.2'
-  expected_answer: 'No — its signature changed in 0.2: (llm: langchain_core.language_models.base.BaseLanguageModel,
-    tools: Sequence[langchain_core.tools.BaseTool], prompt: langchain_core.prompts.chat.ChatPromptTemplate)
-    -> langchain_core.runnables.base.Runnable -> (llm: langchain_core.language_models.base.BaseLanguageModel,
+  target_version: '0.3'
+  expected_answer: 'No — its signature changed in 0.3: (llm: langchain_core.language_models.base.BaseLanguageModel,
     tools: Sequence[langchain_core.tools.base.BaseTool], prompt: langchain_core.prompts.chat.ChatPromptTemplate,
     stop_sequence: Union[bool, List[str]] = True, tools_renderer: Callable[[List[langchain_core.tools.base.BaseTool]],
     str] = <function render_text_description at 0x7b79a9ef8860>, template_tool_response:
+    str = "TOOL RESPONSE: \n---------------------\n{observation}\n\nUSER''S INPUT\n--------------------\n\nOkay,
+    so what is the response to my last comment? If using information obtained from
+    the tools you must mention it explicitly without mentioning the tool names - I
+    have forgotten all TOOL RESPONSES! Remember to respond with a markdown code snippet
+    of a json blob with a single action, and NOTHING else - even if you just want
+    to respond to the user. Do NOT respond with anything except a JSON snippet no
+    matter what!") -> langchain_core.runnables.base.Runnable -> (llm: langchain_core.language_models.base.BaseLanguageModel,
+    tools: Sequence[langchain_core.tools.base.BaseTool], prompt: langchain_core.prompts.chat.ChatPromptTemplate,
+    stop_sequence: Union[bool, List[str]] = True, tools_renderer: Callable[[list[langchain_core.tools.base.BaseTool]],
+    str] = <function render_text_description at 0x7fe1f7b4da80>, template_tool_response:
     str = "TOOL RESPONSE: \n---------------------\n{observation}\n\nUSER''S INPUT\n--------------------\n\nOkay,
     so what is the response to my last comment? If using information obtained from
     the tools you must mention it explicitly without mentioning the tool names - I
@@ -316,7 +312,7 @@
   question: In version 0.2, is `load_agent` still recommended for use?
   category: version_explicit
   target_version: '0.2'
-  expected_answer: It's deprecated as of 0.2. No replacement was recorded.
+  expected_answer: It's deprecated as of 0.2. It's now available as `langchain_classic.agents.loading.load_agent`.
   expected_symbols:
   - langchain.agents.loading.load_agent
   should_abstain: false
@@ -710,15 +706,15 @@
   should_abstain: false
   reviewed: false
   reviewer_note: null
-- id: 4edfa78e-f964-5cab-b4b1-742c16518fc2
-  question: I'm upgrading from 0.1 to 0.2 — what changed for `OpenAIAssistantRunnable`?
+- id: 3b04a8fa-f9ff-5ca2-bcc7-70a77cb43d88
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `OpenAIAssistantRunnable`?
   category: migration
-  target_version: '0.2'
-  expected_answer: '(*, name: Optional[str] = None, client: ForwardRef(''openai.OpenAI'')
-    = None, assistant_id: str, check_every_ms: float = 1000.0, as_agent: bool = False)
-    -> None -> (*args: Any, name: Optional[str] = None, client: Any = None, async_client:
+  target_version: '0.3'
+  expected_answer: '(*args: Any, name: Optional[str] = None, client: Any = None, async_client:
     Any = None, assistant_id: str, check_every_ms: float = 1000.0, as_agent: bool
-    = False) -> None'
+    = False) -> None -> (*args: Any, name: Optional[str] = None, client: Any = <factory>,
+    async_client: Any = None, assistant_id: str, check_every_ms: float = 1000.0, as_agent:
+    bool = False) -> None'
   expected_symbols:
   - langchain.agents.openai_assistant.base.OpenAIAssistantRunnable
   should_abstain: false
@@ -842,14 +838,13 @@
   should_abstain: false
   reviewed: false
   reviewer_note: null
-- id: dff27ecf-eb8f-5b24-bd71-efb8909e02eb
-  question: I'm upgrading from 0.2 to 0.3 — what changed for `ReActJsonSingleInputOutputParser`?
+- id: 80449c0e-9528-5e1d-8464-da73e4fd12b1
+  question: I'm upgrading from 0.1 to 0.2 — what changed for `ReActJsonSingleInputOutputParser`?
   category: migration
-  target_version: '0.3'
-  expected_answer: '(*args: Any, name: Optional[str] = None, pattern: re.Pattern =
-    re.compile(''^.*?`{3}(?:json)?\\n?(.*?)`{3}.*?$'', re.DOTALL)) -> None -> (*args:
-    Any, name: Optional[str] = None, pattern: Pattern = re.compile(''^.*?`{3}(?:json)?\\n?(.*?)`{3}.*?$'',
-    re.DOTALL)) -> None'
+  target_version: '0.2'
+  expected_answer: '(*, name: Optional[str] = None, pattern: re.Pattern = re.compile(''^.*?`{3}(?:json)?\\n(.*?)`{3}.*?$'',
+    re.DOTALL)) -> None -> (*args: Any, name: Optional[str] = None, pattern: re.Pattern
+    = re.compile(''^.*?`{3}(?:json)?\\n?(.*?)`{3}.*?$'', re.DOTALL)) -> None'
   expected_symbols:
   - langchain.agents.output_parsers.react_json_single_input.ReActJsonSingleInputOutputParser
   should_abstain: false
@@ -905,15 +900,18 @@
   should_abstain: false
   reviewed: false
   reviewer_note: null
-- id: 7c483b9a-2fe1-56c2-865b-8ea1d5da8a88
-  question: I'm upgrading from 0.1 to 0.2 — what changed for `create_react_agent`?
+- id: 737edea5-5394-5f34-a1ee-8c37fe65dba1
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `create_react_agent`?
   category: migration
-  target_version: '0.2'
+  target_version: '0.3'
   expected_answer: '(llm: ''BaseLanguageModel'', tools: ''Sequence[BaseTool]'', prompt:
-    ''BasePromptTemplate'') -> ''Runnable'' -> (llm: ''BaseLanguageModel'', tools:
-    ''Sequence[BaseTool]'', prompt: ''BasePromptTemplate'', output_parser: ''Optional[AgentOutputParser]''
-    = None, tools_renderer: ''ToolsRenderer'' = <function render_text_description
-    at 0x7b79a9ef8860>, *, stop_sequence: ''Union[bool, List[str]]'' = True) -> ''Runnable'''
+    ''BasePromptTemplate'', output_parser: ''Optional[AgentOutputParser]'' = None,
+    tools_renderer: ''ToolsRenderer'' = <function render_text_description at 0x7b79a9ef8860>,
+    *, stop_sequence: ''Union[bool, List[str]]'' = True) -> ''Runnable'' -> (llm:
+    ''BaseLanguageModel'', tools: ''Sequence[BaseTool]'', prompt: ''BasePromptTemplate'',
+    output_parser: ''Optional[AgentOutputParser]'' = None, tools_renderer: ''ToolsRenderer''
+    = <function render_text_description at 0x7fe1f7b4da80>, *, stop_sequence: ''Union[bool,
+    List[str]]'' = True) -> ''Runnable'''
   expected_symbols:
   - langchain.agents.react.agent.create_react_agent
   should_abstain: false
@@ -978,7 +976,7 @@
   category: removed_api
   target_version: 1.4.0
   expected_answer: '`langchain.agents.conversational_chat.output_parser.ConvoOutputParser.aparse`
-    was removed going from 0.3 to 1.4.0. No replacement was recorded.'
+    was removed going from 0.3 to 1.4.0. It''s now available as `langchain_classic.agents.agent.AgentOutputParser.aparse`.'
   expected_symbols:
   - langchain.agents.conversational_chat.output_parser.ConvoOutputParser.aparse
   should_abstain: false
@@ -989,7 +987,7 @@
   category: removed_api
   target_version: 1.4.0
   expected_answer: '`langchain.agents.conversational.output_parser.ConvoOutputParser.ainvoke`
-    was removed going from 0.3 to 1.4.0. No replacement was recorded.'
+    was removed going from 0.3 to 1.4.0. It''s now available as `langchain_classic.evaluation.embedding_distance.base.PairwiseEmbeddingDistanceEvalChain.ainvoke`.'
   expected_symbols:
   - langchain.agents.conversational.output_parser.ConvoOutputParser.ainvoke
   should_abstain: false
@@ -1022,7 +1020,7 @@
   category: removed_api
   target_version: 1.4.0
   expected_answer: '`langchain.agents.openai_functions_multi_agent.base.OpenAIMultiFunctionsAgent.validate_prompt`
-    was removed going from 0.3 to 1.4.0. No replacement was recorded.'
+    was removed going from 0.3 to 1.4.0. It''s now available as `langchain_classic.agents.agent.Agent.validate_prompt`.'
   expected_symbols:
   - langchain.agents.openai_functions_multi_agent.base.OpenAIMultiFunctionsAgent.validate_prompt
   should_abstain: false
@@ -1044,7 +1042,7 @@
   category: removed_api
   target_version: '0.2'
   expected_answer: '`langchain.agents.output_parsers.openai_tools.OpenAIToolAgentAction.to_json_not_implemented`
-    was removed going from 0.1 to 0.2. No replacement was recorded.'
+    was removed going from 0.1 to 0.2. It''s now available as `langchain_classic.evaluation.embedding_distance.base.EmbeddingDistanceEvalChain.to_json_not_implemented`.'
   expected_symbols:
   - langchain.agents.output_parsers.openai_tools.OpenAIToolAgentAction.to_json_not_implemented
   should_abstain: false
@@ -1066,7 +1064,7 @@
   category: removed_api
   target_version: '0.2'
   expected_answer: '`langchain.callbacks.file.FileCallbackHandler.on_agent_action`
-    was removed going from 0.1 to 0.2. No replacement was recorded.'
+    was removed going from 0.1 to 0.2. It''s now available as `langchain_classic.callbacks.streaming_aiter.AsyncIteratorCallbackHandler.on_agent_action`.'
   expected_symbols:
   - langchain.callbacks.file.FileCallbackHandler.on_agent_action
   should_abstain: false
@@ -1077,7 +1075,7 @@
   category: removed_api
   target_version: '0.2'
   expected_answer: '`langchain.chains.api.base.APIChain.acall` was removed going from
-    0.1 to 0.2. No replacement was recorded.'
+    0.1 to 0.2. It''s now available as `langchain_classic.evaluation.embedding_distance.base.PairwiseEmbeddingDistanceEvalChain.acall`.'
   expected_symbols:
   - langchain.chains.api.base.APIChain.acall
   should_abstain: false
@@ -1110,7 +1108,7 @@
   category: removed_api
   target_version: '0.2'
   expected_answer: '`langchain.chains.api.openapi.requests_chain.APIRequesterChain.aapply`
-    was removed going from 0.1 to 0.2. No replacement was recorded.'
+    was removed going from 0.1 to 0.2. It''s now available as `langchain_classic.evaluation.qa.eval_chain.ContextQAEvalChain.aapply`.'
   expected_symbols:
   - langchain.chains.api.openapi.requests_chain.APIRequesterChain.aapply
   should_abstain: false
@@ -1121,7 +1119,7 @@
   category: removed_api
   target_version: '0.2'
   expected_answer: '`langchain.chains.api.openapi.requests_chain.APIRequesterOutputParser.ainvoke`
-    was removed going from 0.1 to 0.2. No replacement was recorded.'
+    was removed going from 0.1 to 0.2. It''s now available as `langchain_classic.evaluation.embedding_distance.base.PairwiseEmbeddingDistanceEvalChain.ainvoke`.'
   expected_symbols:
   - langchain.chains.api.openapi.requests_chain.APIRequesterOutputParser.ainvoke
   should_abstain: false
@@ -1277,7 +1275,7 @@
   category: removed_api
   target_version: 1.4.0
   expected_answer: '`langchain.chains.hyde.base.HypotheticalDocumentEmbedder` was
-    removed going from 0.3 to 1.4.0. No replacement was recorded.'
+    removed going from 0.3 to 1.4.0. It''s now available as `langchain_classic.chains.hyde.base.HypotheticalDocumentEmbedder`.'
   expected_symbols:
   - langchain.chains.hyde.base.HypotheticalDocumentEmbedder
   should_abstain: false
@@ -1300,7 +1298,7 @@
   category: removed_api
   target_version: '0.2'
   expected_answer: '`langchain.chains.openai_functions.base.create_structured_output_runnable`
-    was removed going from 0.1 to 0.2. No replacement was recorded.'
+    was removed going from 0.1 to 0.2. It''s now available as `langchain_classic.chains.structured_output.base.create_structured_output_runnable`.'
   expected_symbols:
   - langchain.chains.openai_functions.base.create_structured_output_runnable
   should_abstain: false
