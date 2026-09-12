@@ -3,6 +3,8 @@ from pathlib import Path
 import typer
 
 from versed.db.session import get_session
+from versed.golden_set import generate_golden_set, write_golden_set
+from versed.golden_set_load import load_golden_set
 from versed.ingest.docs_pipeline import ingest_docs_for_version
 from versed.ingest.manifest import build_manifest
 from versed.ingest.symbol_pipeline import build_symbols_for_version
@@ -62,6 +64,28 @@ def timeline_cmd(symbol: str) -> None:
 def ask_cmd(question: str, k: int = 5) -> None:
     chain = build_rag_chain(k=k)
     typer.echo(chain.invoke(question))
+
+
+golden_set_app = typer.Typer()
+app.add_typer(golden_set_app, name="golden-set")
+
+
+@golden_set_app.command("generate")
+def golden_set_generate_cmd(out: Path = Path("data/golden_set.yaml")) -> None:
+    manifest = build_manifest()
+    versions = [source.version for source in manifest]
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with get_session() as session:
+        questions = generate_golden_set(session, versions)
+    write_golden_set(questions, out)
+    typer.echo(f"Wrote {len(questions)} draft questions to {out}")
+
+
+@golden_set_app.command("load")
+def golden_set_load_cmd(path: Path = Path("data/golden_set.yaml")) -> None:
+    with get_session() as session:
+        count = load_golden_set(path, session)
+    typer.echo(f"Loaded {count} questions into eval_question")
 
 
 if __name__ == "__main__":
