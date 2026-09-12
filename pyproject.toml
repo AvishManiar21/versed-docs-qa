@@ -5,7 +5,7 @@ description = "Version-aware documentation QA over LangChain's docs"
 requires-python = ">=3.12"
 dependencies = [
     "sqlalchemy>=2.0.35",
-    "psycopg[binary]>=3.2",
+    "psycopg[binary]>=3.3.5",
     "pgvector>=0.3.6",
     "alembic>=1.13.3",
     "pydantic-settings>=2.5",
