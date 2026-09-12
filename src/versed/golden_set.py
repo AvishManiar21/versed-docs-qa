@@ -175,6 +175,25 @@ def _find_prior_alternative(qualified_name: str, session: Session) -> str | None
     return session.scalars(stmt).first()
 
 
+def _find_langchain_classic_move(qualified_name: str, session: Session) -> str | None:
+    """A symbol removed from `langchain` during the langchain_classic package
+    split often reappears under `langchain_classic` with the same short
+    name, as a separate `added` or `moved` event rather than a paired
+    `moved` event for this exact qualified name — diff_versions()'s
+    move-pairing heuristic doesn't always link the two across a package
+    rename. Returns the langchain_classic qualified name if one exists.
+    """
+    short = _short_name(qualified_name)
+    stmt = (
+        select(SymbolEvent.qualified_name)
+        .where(SymbolEvent.qualified_name.like(f"langchain_classic%{short}"))
+        .where(SymbolEvent.event_type.in_(["added", "moved"]))
+        .order_by(SymbolEvent.to_version)
+        .limit(1)
+    )
+    return session.scalars(stmt).first()
+
+
 def _real_events(
     session: Session, versions: list[str], event_types: list[str]
 ) -> list[SymbolEvent]:
@@ -211,7 +230,16 @@ def _generate_version_explicit(
             if event.detail:
                 answer = f"It's deprecated as of {event.to_version}. Recommended alternative: {event.detail}."
             else:
-                answer = f"It's deprecated as of {event.to_version}. No replacement was recorded."
+                classic_move = _find_langchain_classic_move(event.qualified_name, session)
+                if classic_move:
+                    answer = (
+                        f"It's deprecated as of {event.to_version}. "
+                        f"It's now available as `{classic_move}`."
+                    )
+                else:
+                    answer = (
+                        f"It's deprecated as of {event.to_version}. No replacement was recorded."
+                    )
             target_version = event.to_version
         elif event.event_type == "changed":
             question = (
@@ -222,11 +250,15 @@ def _generate_version_explicit(
         else:  # removed
             question = f"Is `{short}` still available in version {event.to_version}?"
             replacement = _find_prior_alternative(event.qualified_name, session)
-            tail = (
-                f" It was previously deprecated with recommended alternative: {replacement}."
-                if replacement
-                else ""
+            classic_move = (
+                None if replacement else _find_langchain_classic_move(event.qualified_name, session)
             )
+            if replacement:
+                tail = f" It was previously deprecated with recommended alternative: {replacement}."
+            elif classic_move:
+                tail = f" It's now available as `{classic_move}`."
+            else:
+                tail = ""
             answer = (
                 f"No — `{event.qualified_name}` was removed going from "
                 f"{event.from_version} to {event.to_version}.{tail}"
@@ -290,11 +322,15 @@ def _generate_removed_api(
         if question in used_questions:
             continue
         replacement = _find_prior_alternative(event.qualified_name, session)
-        tail = (
-            f" It was previously deprecated with recommended alternative: {replacement}."
-            if replacement
-            else " No replacement was recorded."
+        classic_move = (
+            None if replacement else _find_langchain_classic_move(event.qualified_name, session)
         )
+        if replacement:
+            tail = f" It was previously deprecated with recommended alternative: {replacement}."
+        elif classic_move:
+            tail = f" It's now available as `{classic_move}`."
+        else:
+            tail = " No replacement was recorded."
         answer = (
             f"`{event.qualified_name}` was removed going from "
             f"{event.from_version} to {event.to_version}.{tail}"
