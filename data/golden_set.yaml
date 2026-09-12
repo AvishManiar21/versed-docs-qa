@@ -1,0 +1,1778 @@
+- id: 331770d2-f2c3-4e7f-8a0c-1430ca602cfa
+  question: In version 0.2, is `Agent` still recommended for use?
+  category: version_explicit
+  target_version: '0.2'
+  expected_answer: 'It''s deprecated as of 0.2. Recommended alternative: Use new agent
+    constructor methods like create_react_agent, create_json_agent, create_structured_chat_agent,
+    etc..'
+  expected_symbols:
+  - langchain.agents.agent.Agent
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 52417ce6-9a0c-4048-be14-59642f4add79
+  question: Is `aplan` still available in version 1.4.0?
+  category: version_explicit
+  target_version: 1.4.0
+  expected_answer: No — `langchain.agents.agent.Agent.aplan` was removed going from
+    0.3 to 1.4.0.
+  expected_symbols:
+  - langchain.agents.agent.Agent.aplan
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 17905fa6-74c6-4652-b0ee-6f2d42ae65b6
+  question: In version 0.3, does `copy` have the same signature as before?
+  category: version_explicit
+  target_version: '0.3'
+  expected_answer: 'No — its signature changed in 0.3: (self: ''Model'', *, include:
+    Union[ForwardRef(''AbstractSetIntStr''), ForwardRef(''MappingIntStrAny''), NoneType]
+    = None, exclude: Union[ForwardRef(''AbstractSetIntStr''), ForwardRef(''MappingIntStrAny''),
+    NoneType] = None, update: Optional[ForwardRef(''DictStrAny'')] = None, deep: bool
+    = False) -> ''Model'' -> (self, *, include: ''AbstractSetIntStr | MappingIntStrAny
+    | None'' = None, exclude: ''AbstractSetIntStr | MappingIntStrAny | None'' = None,
+    update: ''Dict[str, Any] | None'' = None, deep: ''bool'' = False) -> ''Self'''
+  expected_symbols:
+  - langchain.agents.agent.Agent.copy
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 5f3871cc-32ba-4046-b5e1-f97afcdb443b
+  question: Is `dict` still available in version 1.4.0?
+  category: version_explicit
+  target_version: 1.4.0
+  expected_answer: No — `langchain.agents.agent.Agent.dict` was removed going from
+    0.3 to 1.4.0.
+  expected_symbols:
+  - langchain.agents.agent.Agent.dict
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: f6a75ffd-a376-4bd1-adbb-70e6db1c7ae4
+  question: In version 0.2, does `AgentExecutor` have the same signature as before?
+  category: version_explicit
+  target_version: '0.2'
+  expected_answer: 'No — its signature changed in 0.2: (*, name: Optional[str] = None,
+    memory: Optional[langchain_core.memory.BaseMemory] = None, callbacks: Union[List[langchain_core.callbacks.base.BaseCallbackHandler],
+    langchain_core.callbacks.base.BaseCallbackManager, NoneType] = None, verbose:
+    bool = None, tags: Optional[List[str]] = None, metadata: Optional[Dict[str, Any]]
+    = None, callback_manager: Optional[langchain_core.callbacks.base.BaseCallbackManager]
+    = None, agent: Union[langchain.agents.agent.BaseSingleActionAgent, langchain.agents.agent.BaseMultiActionAgent],
+    tools: Sequence[langchain_core.tools.BaseTool], return_intermediate_steps: bool
+    = False, max_iterations: Optional[int] = 15, max_execution_time: Optional[float]
+    = None, early_stopping_method: str = ''force'', handle_parsing_errors: Union[bool,
+    str, Callable[[langchain_core.exceptions.OutputParserException], str]] = False,
+    trim_intermediate_steps: Union[int, Callable[[List[Tuple[langchain_core.agents.AgentAction,
+    str]]], List[Tuple[langchain_core.agents.AgentAction, str]]]] = -1) -> None ->
+    (*args: Any, name: Optional[str] = None, memory: Optional[langchain_core.memory.BaseMemory]
+    = None, callbacks: Union[List[langchain_core.callbacks.base.BaseCallbackHandler],
+    langchain_core.callbacks.base.BaseCallbackManager, NoneType] = None, verbose:
+    bool = None, tags: Optional[List[str]] = None, metadata: Optional[Dict[str, Any]]
+    = None, callback_manager: Optional[langchain_core.callbacks.base.BaseCallbackManager]
+    = None, agent: Union[langchain.agents.agent.BaseSingleActionAgent, langchain.agents.agent.BaseMultiActionAgent],
+    tools: Sequence[langchain_core.tools.base.BaseTool], return_intermediate_steps:
+    bool = False, max_iterations: Optional[int] = 15, max_execution_time: Optional[float]
+    = None, early_stopping_method: str = ''force'', handle_parsing_errors: Union[bool,
+    str, Callable[[langchain_core.exceptions.OutputParserException], str]] = False,
+    trim_intermediate_steps: Union[int, Callable[[List[Tuple[langchain_core.agents.AgentAction,
+    str]]], List[Tuple[langchain_core.agents.AgentAction, str]]]] = -1) -> None'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 13bb81e6-7c28-440a-8ec5-278e64ae8fe0
+  question: In version 0.3, does `abatch` have the same signature as before?
+  category: version_explicit
+  target_version: '0.3'
+  expected_answer: 'No — its signature changed in 0.3: (self, inputs: ''List[Input]'',
+    config: ''Optional[Union[RunnableConfig, List[RunnableConfig]]]'' = None, *, return_exceptions:
+    ''bool'' = False, **kwargs: ''Optional[Any]'') -> ''List[Output]'' -> (self, inputs:
+    ''list[Input]'', config: ''Optional[Union[RunnableConfig, list[RunnableConfig]]]''
+    = None, *, return_exceptions: ''bool'' = False, **kwargs: ''Optional[Any]'') ->
+    ''list[Output]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.abatch
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 7cb2d575-15a8-4c17-b1cd-b3989a6999a9
+  question: Was `abatch_as_completed` available in LangChain 0.1?
+  category: version_explicit
+  target_version: '0.1'
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.abatch_as_completed`
+    was not introduced until 0.2.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.abatch_as_completed
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 5fced137-ba01-40aa-8c4f-0ee5de586070
+  question: In version 0.2, is `acall` still recommended for use?
+  category: version_explicit
+  target_version: '0.2'
+  expected_answer: 'It''s deprecated as of 0.2. Recommended alternative: ainvoke.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.acall
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 64a895fa-20c5-4b8c-9471-3cefd1e62a25
+  question: Is `ainvoke` still available in version 1.4.0?
+  category: version_explicit
+  target_version: 1.4.0
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.ainvoke` was removed
+    going from 0.3 to 1.4.0.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.ainvoke
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 7d3bc656-5b9a-4316-a5e7-ae13830ac148
+  question: In version 0.2, is `apply` still recommended for use?
+  category: version_explicit
+  target_version: '0.2'
+  expected_answer: 'It''s deprecated as of 0.2. Recommended alternative: batch.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.apply
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 70ef3dc5-f1fa-4257-ad7e-29340ee13294
+  question: Was `aprep_inputs` available in LangChain 0.1?
+  category: version_explicit
+  target_version: '0.1'
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.aprep_inputs` was not
+    introduced until 0.2.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.aprep_inputs
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 5287ac8a-2c4b-4457-8fd3-3955fe19411f
+  question: Was `aprep_outputs` available in LangChain 0.1?
+  category: version_explicit
+  target_version: '0.1'
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.aprep_outputs` was not
+    introduced until 0.2.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.aprep_outputs
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: b78b7ebb-9805-4c1d-b0a4-3961cb045b27
+  question: In version 0.2, is `arun` still recommended for use?
+  category: version_explicit
+  target_version: '0.2'
+  expected_answer: 'It''s deprecated as of 0.2. Recommended alternative: ainvoke.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.arun
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 04bba33f-e768-4623-91df-616a2a664e36
+  question: In version 0.3, does `assign` have the same signature as before?
+  category: version_explicit
+  target_version: '0.3'
+  expected_answer: 'No — its signature changed in 0.3: (self, **kwargs: ''Union[Runnable[Dict[str,
+    Any], Any], Callable[[Dict[str, Any]], Any], Mapping[str, Union[Runnable[Dict[str,
+    Any], Any], Callable[[Dict[str, Any]], Any]]]]'') -> ''RunnableSerializable[Any,
+    Any]'' -> (self, **kwargs: ''Union[Runnable[dict[str, Any], Any], Callable[[dict[str,
+    Any]], Any], Mapping[str, Union[Runnable[dict[str, Any], Any], Callable[[dict[str,
+    Any]], Any]]]]'') -> ''RunnableSerializable[Any, Any]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.assign
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 1da75582-ec41-4ed5-a847-89c5410bbae4
+  question: Was `as_tool` available in LangChain 0.1?
+  category: version_explicit
+  target_version: '0.1'
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.as_tool` was not introduced
+    until 0.2.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.as_tool
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 5d429fe9-d08d-46e5-bae5-37c5faeb8f77
+  question: Is `astream` still available in version 1.4.0?
+  category: version_explicit
+  target_version: 1.4.0
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.astream` was removed
+    going from 0.3 to 1.4.0.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.astream
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 264c4fac-7628-41f8-be13-636d8f7b8a2d
+  question: In version 0.2, does `astream_events` have the same signature as before?
+  category: version_explicit
+  target_version: '0.2'
+  expected_answer: 'No — its signature changed in 0.2: (self, input: ''Any'', config:
+    ''Optional[RunnableConfig]'' = None, *, version: "Literal[''v1'']", include_names:
+    ''Optional[Sequence[str]]'' = None, include_types: ''Optional[Sequence[str]]''
+    = None, include_tags: ''Optional[Sequence[str]]'' = None, exclude_names: ''Optional[Sequence[str]]''
+    = None, exclude_types: ''Optional[Sequence[str]]'' = None, exclude_tags: ''Optional[Sequence[str]]''
+    = None, **kwargs: ''Any'') -> ''AsyncIterator[StreamEvent]'' -> (self, input:
+    ''Any'', config: ''Optional[RunnableConfig]'' = None, *, version: "Literal[''v1'',
+    ''v2'']", include_names: ''Optional[Sequence[str]]'' = None, include_types: ''Optional[Sequence[str]]''
+    = None, include_tags: ''Optional[Sequence[str]]'' = None, exclude_names: ''Optional[Sequence[str]]''
+    = None, exclude_types: ''Optional[Sequence[str]]'' = None, exclude_tags: ''Optional[Sequence[str]]''
+    = None, **kwargs: ''Any'') -> ''AsyncIterator[StreamEvent]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.astream_events
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 90246279-cfcd-4e15-b2b5-5813d6e1995e
+  question: Is `astream_log` still available in version 1.4.0?
+  category: version_explicit
+  target_version: 1.4.0
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.astream_log` was removed
+    going from 0.3 to 1.4.0.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.astream_log
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 8b50a9a2-5c01-4c1b-a091-64337367520f
+  question: Is `atransform` still available in version 1.4.0?
+  category: version_explicit
+  target_version: 1.4.0
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.atransform` was removed
+    going from 0.3 to 1.4.0.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.atransform
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 3f0179ef-eb6b-46be-bbac-e490abd5d022
+  question: In version 0.3, does `batch` have the same signature as before?
+  category: version_explicit
+  target_version: '0.3'
+  expected_answer: 'No — its signature changed in 0.3: (self, inputs: ''List[Input]'',
+    config: ''Optional[Union[RunnableConfig, List[RunnableConfig]]]'' = None, *, return_exceptions:
+    ''bool'' = False, **kwargs: ''Optional[Any]'') -> ''List[Output]'' -> (self, inputs:
+    ''list[Input]'', config: ''Optional[Union[RunnableConfig, list[RunnableConfig]]]''
+    = None, *, return_exceptions: ''bool'' = False, **kwargs: ''Optional[Any]'') ->
+    ''list[Output]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.batch
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: de045f7e-9ff1-442b-8b9c-2a5ecfb11902
+  question: Was `batch_as_completed` available in LangChain 0.1?
+  category: version_explicit
+  target_version: '0.1'
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.batch_as_completed`
+    was not introduced until 0.2.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.batch_as_completed
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 8c2be54d-c48b-4599-ab86-34d2a83eaaad
+  question: Is `bind` still available in version 1.4.0?
+  category: version_explicit
+  target_version: 1.4.0
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.bind` was removed going
+    from 0.3 to 1.4.0.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.bind
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 1b04a03c-d67e-4c24-ab64-7eaf9cd02a4b
+  question: In version 0.3, does `config_schema` have the same signature as before?
+  category: version_explicit
+  target_version: '0.3'
+  expected_answer: 'No — its signature changed in 0.3: (self, *, include: ''Optional[Sequence[str]]''
+    = None) -> ''Type[BaseModel]'' -> (self, *, include: ''Optional[Sequence[str]]''
+    = None) -> ''type[BaseModel]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.config_schema
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 0a92cf2c-a53c-4546-9b4d-ef080b154cff
+  question: Is `configurable_alternatives` still available in version 1.4.0?
+  category: version_explicit
+  target_version: 1.4.0
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.configurable_alternatives`
+    was removed going from 0.3 to 1.4.0.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.configurable_alternatives
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: f0051e94-beef-42f0-8067-56593ff67332
+  question: Is `configurable_fields` still available in version 1.4.0?
+  category: version_explicit
+  target_version: 1.4.0
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.configurable_fields`
+    was removed going from 0.3 to 1.4.0.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.configurable_fields
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 90ad514a-ccf5-4ddc-8508-c6fda4f0a02b
+  question: In version 0.3, does `copy` have the same signature as before?
+  category: version_explicit
+  target_version: '0.3'
+  expected_answer: 'No — its signature changed in 0.3: (self: ''Model'', *, include:
+    Union[ForwardRef(''AbstractSetIntStr''), ForwardRef(''MappingIntStrAny''), NoneType]
+    = None, exclude: Union[ForwardRef(''AbstractSetIntStr''), ForwardRef(''MappingIntStrAny''),
+    NoneType] = None, update: Optional[ForwardRef(''DictStrAny'')] = None, deep: bool
+    = False) -> ''Model'' -> (self, *, include: ''AbstractSetIntStr | MappingIntStrAny
+    | None'' = None, exclude: ''AbstractSetIntStr | MappingIntStrAny | None'' = None,
+    update: ''Dict[str, Any] | None'' = None, deep: ''bool'' = False) -> ''Self'''
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.copy
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 4d4d8f6c-a451-4fa6-bc4e-c935c01e7efa
+  question: Is `dict` still available in version 1.4.0?
+  category: version_explicit
+  target_version: 1.4.0
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.dict` was removed going
+    from 0.3 to 1.4.0.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.dict
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 0ff6e02c-9d24-4a59-a074-d0de173e86c3
+  question: Was `get_config_jsonschema` available in LangChain 0.2?
+  category: version_explicit
+  target_version: '0.2'
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.get_config_jsonschema`
+    was not introduced until 0.3.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.get_config_jsonschema
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: c251f835-31b0-4bcc-907c-48035242cdb5
+  question: Is `get_graph` still available in version 1.4.0?
+  category: version_explicit
+  target_version: 1.4.0
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.get_graph` was removed
+    going from 0.3 to 1.4.0.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.get_graph
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: f48ab2ac-4087-4de7-9b8c-269de377012f
+  question: Was `get_input_jsonschema` available in LangChain 0.2?
+  category: version_explicit
+  target_version: '0.2'
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.get_input_jsonschema`
+    was not introduced until 0.3.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.get_input_jsonschema
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 9ea60c99-d1a2-4177-a2b7-45b4a487d27f
+  question: In version 0.3, does `get_input_schema` have the same signature as before?
+  category: version_explicit
+  target_version: '0.3'
+  expected_answer: 'No — its signature changed in 0.3: (self, config: Optional[langchain_core.runnables.config.RunnableConfig]
+    = None) -> Type[pydantic.v1.main.BaseModel] -> (self, config: Optional[langchain_core.runnables.config.RunnableConfig]
+    = None) -> Type[pydantic.main.BaseModel]'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.get_input_schema
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 828f8281-ccb9-4830-b98e-b3b79ad6a367
+  question: Is `get_name` still available in version 1.4.0?
+  category: version_explicit
+  target_version: 1.4.0
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.get_name` was removed
+    going from 0.3 to 1.4.0.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.get_name
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 8e7dfda1-6122-42f3-9222-42bea43c78c7
+  question: Was `get_output_jsonschema` available in LangChain 0.2?
+  category: version_explicit
+  target_version: '0.2'
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.get_output_jsonschema`
+    was not introduced until 0.3.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.get_output_jsonschema
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 2ec58514-d5f5-41c7-8211-9161bd6f48c9
+  question: In version 0.3, does `get_output_schema` have the same signature as before?
+  category: version_explicit
+  target_version: '0.3'
+  expected_answer: 'No — its signature changed in 0.3: (self, config: Optional[langchain_core.runnables.config.RunnableConfig]
+    = None) -> Type[pydantic.v1.main.BaseModel] -> (self, config: Optional[langchain_core.runnables.config.RunnableConfig]
+    = None) -> Type[pydantic.main.BaseModel]'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.get_output_schema
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: c95d865e-e3e5-470a-a039-06cb1402433f
+  question: In version 0.3, does `get_prompts` have the same signature as before?
+  category: version_explicit
+  target_version: '0.3'
+  expected_answer: 'No — its signature changed in 0.3: (self, config: ''Optional[RunnableConfig]''
+    = None) -> ''List[BasePromptTemplate]'' -> (self, config: ''Optional[RunnableConfig]''
+    = None) -> ''list[BasePromptTemplate]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.get_prompts
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 14e34fa2-8400-43bf-92e9-c3ffdd21edb5
+  question: Is `invoke` still available in version 1.4.0?
+  category: version_explicit
+  target_version: 1.4.0
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.invoke` was removed
+    going from 0.3 to 1.4.0.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.invoke
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 97acb6b9-71bd-4467-848c-f6892d61b8a2
+  question: Is `iter` still available in version 1.4.0?
+  category: version_explicit
+  target_version: 1.4.0
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.iter` was removed going
+    from 0.3 to 1.4.0.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.iter
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: ae708c36-1c7e-4ffb-8bff-12240486b42a
+  question: In version 0.3, does `json` have the same signature as before?
+  category: version_explicit
+  target_version: '0.3'
+  expected_answer: 'No — its signature changed in 0.3: (self, *, include: Union[ForwardRef(''AbstractSetIntStr''),
+    ForwardRef(''MappingIntStrAny''), NoneType] = None, exclude: Union[ForwardRef(''AbstractSetIntStr''),
+    ForwardRef(''MappingIntStrAny''), NoneType] = None, by_alias: bool = False, skip_defaults:
+    Optional[bool] = None, exclude_unset: bool = False, exclude_defaults: bool = False,
+    exclude_none: bool = False, encoder: Optional[Callable[[Any], Any]] = None, models_as_dict:
+    bool = True, **dumps_kwargs: Any) -> str -> (self, *, include: ''IncEx | None''
+    = None, exclude: ''IncEx | None'' = None, by_alias: ''bool'' = False, exclude_unset:
+    ''bool'' = False, exclude_defaults: ''bool'' = False, exclude_none: ''bool'' =
+    False, encoder: ''Callable[[Any], Any] | None'' = PydanticUndefined, models_as_dict:
+    ''bool'' = PydanticUndefined, **dumps_kwargs: ''Any'') -> ''str'''
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.json
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 4b554069-d9cd-4272-9e59-2e8c54330688
+  question: Is `lookup_tool` still available in version 1.4.0?
+  category: version_explicit
+  target_version: 1.4.0
+  expected_answer: No — `langchain.agents.agent.AgentExecutor.lookup_tool` was removed
+    going from 0.3 to 1.4.0.
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.lookup_tool
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 3ea52cf9-4425-425c-9937-89255769fc63
+  question: In version 0.3, does `map` have the same signature as before?
+  category: version_explicit
+  target_version: '0.3'
+  expected_answer: 'No — its signature changed in 0.3: (self) -> ''Runnable[List[Input],
+    List[Output]]'' -> (self) -> ''Runnable[list[Input], list[Output]]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.map
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 26a3b093-b6a6-4648-bea5-258e50b377a5
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `pick`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, keys: ''Union[str, List[str]]'') -> ''RunnableSerializable[Any,
+    Any]'' -> (self, keys: ''Union[str, list[str]]'') -> ''RunnableSerializable[Any,
+    Any]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.pick
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 5147f621-3794-4480-810a-d0e6e8bb0093
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `run`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, *args: Any, callbacks: Union[List[langchain_core.callbacks.base.BaseCallbackHandler],
+    langchain_core.callbacks.base.BaseCallbackManager, NoneType] = None, tags: Optional[List[str]]
+    = None, metadata: Optional[Dict[str, Any]] = None, **kwargs: Any) -> Any -> (self,
+    *args: Any, callbacks: Union[list[langchain_core.callbacks.base.BaseCallbackHandler],
+    langchain_core.callbacks.base.BaseCallbackManager, NoneType] = None, tags: Optional[List[str]]
+    = None, metadata: Optional[Dict[str, Any]] = None, **kwargs: Any) -> Any'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.run
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 3d52e625-2152-4888-989d-32bcefb9f325
+  question: I'm upgrading from 0.1 to 0.2 — what changed for `to_json`?
+  category: migration
+  target_version: '0.2'
+  expected_answer: (self) -> Union[langchain_core.load.serializable.SerializedConstructor,
+    langchain_core.load.serializable.SerializedNotImplemented] -> (self) -> 'Union[SerializedConstructor,
+    SerializedNotImplemented]'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.to_json
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 400c5628-9dbd-4055-96c7-7a2c9fe00191
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `with_fallbacks`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, fallbacks: ''Sequence[Runnable[Input, Output]]'', *, exceptions_to_handle:
+    ''Tuple[Type[BaseException], ...]'' = (<class ''Exception''>,), exception_key:
+    ''Optional[str]'' = None) -> ''RunnableWithFallbacksT[Input, Output]'' -> (self,
+    fallbacks: ''Sequence[Runnable[Input, Output]]'', *, exceptions_to_handle: ''tuple[type[BaseException],
+    ...]'' = (<class ''Exception''>,), exception_key: ''Optional[str]'' = None) ->
+    ''RunnableWithFallbacksT[Input, Output]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.with_fallbacks
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 7d9b6dd2-2c57-4ba3-bdf3-6057b76d0e47
+  question: I'm upgrading from 0.1 to 0.2 — what changed for `with_listeners`?
+  category: migration
+  target_version: '0.2'
+  expected_answer: '(self, *, on_start: ''Optional[Listener]'' = None, on_end: ''Optional[Listener]''
+    = None, on_error: ''Optional[Listener]'' = None) -> ''Runnable[Input, Output]''
+    -> (self, *, on_start: ''Optional[Union[Callable[[Run], None], Callable[[Run,
+    RunnableConfig], None]]]'' = None, on_end: ''Optional[Union[Callable[[Run], None],
+    Callable[[Run, RunnableConfig], None]]]'' = None, on_error: ''Optional[Union[Callable[[Run],
+    None], Callable[[Run, RunnableConfig], None]]]'' = None) -> ''Runnable[Input,
+    Output]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.with_listeners
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 0768b716-8e97-4a9b-9058-efb58289777e
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `with_retry`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, *, retry_if_exception_type: ''Tuple[Type[BaseException],
+    ...]'' = (<class ''Exception''>,), wait_exponential_jitter: ''bool'' = True, stop_after_attempt:
+    ''int'' = 3) -> ''Runnable[Input, Output]'' -> (self, *, retry_if_exception_type:
+    ''tuple[type[BaseException], ...]'' = (<class ''Exception''>,), wait_exponential_jitter:
+    ''bool'' = True, exponential_jitter_params: ''Optional[ExponentialJitterParams]''
+    = None, stop_after_attempt: ''int'' = 3) -> ''Runnable[Input, Output]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.with_retry
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 36c883c3-e76f-42bf-a93e-c9f1be2d88c4
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `with_types`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, *, input_type: ''Optional[Type[Input]]'' = None, output_type:
+    ''Optional[Type[Output]]'' = None) -> ''Runnable[Input, Output]'' -> (self, *,
+    input_type: ''Optional[type[Input]]'' = None, output_type: ''Optional[type[Output]]''
+    = None) -> ''Runnable[Input, Output]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.with_types
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: f17dbd4d-8efe-447c-80f5-cf5af1302200
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `json`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, *, include: Union[ForwardRef(''AbstractSetIntStr''), ForwardRef(''MappingIntStrAny''),
+    NoneType] = None, exclude: Union[ForwardRef(''AbstractSetIntStr''), ForwardRef(''MappingIntStrAny''),
+    NoneType] = None, by_alias: bool = False, skip_defaults: Optional[bool] = None,
+    exclude_unset: bool = False, exclude_defaults: bool = False, exclude_none: bool
+    = False, encoder: Optional[Callable[[Any], Any]] = None, models_as_dict: bool
+    = True, **dumps_kwargs: Any) -> str -> (self, *, include: ''IncEx | None'' = None,
+    exclude: ''IncEx | None'' = None, by_alias: ''bool'' = False, exclude_unset: ''bool''
+    = False, exclude_defaults: ''bool'' = False, exclude_none: ''bool'' = False, encoder:
+    ''Callable[[Any], Any] | None'' = PydanticUndefined, models_as_dict: ''bool''
+    = PydanticUndefined, **dumps_kwargs: ''Any'') -> ''str'''
+  expected_symbols:
+  - langchain.agents.agent.Agent.json
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 7e00d3b9-1fa2-4d32-ad62-397aa144b175
+  question: I'm upgrading from 0.1 to 0.2 — what changed for `AgentOutputParser`?
+  category: migration
+  target_version: '0.2'
+  expected_answer: '(*, name: Optional[str] = None) -> None -> (*args: Any, name:
+    Optional[str] = None) -> None'
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 2a8ad15d-3e74-469c-b9e0-25280a0c2bdd
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `abatch`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, inputs: ''List[Input]'', config: ''Optional[Union[RunnableConfig,
+    List[RunnableConfig]]]'' = None, *, return_exceptions: ''bool'' = False, **kwargs:
+    ''Optional[Any]'') -> ''List[Output]'' -> (self, inputs: ''list[Input]'', config:
+    ''Optional[Union[RunnableConfig, list[RunnableConfig]]]'' = None, *, return_exceptions:
+    ''bool'' = False, **kwargs: ''Optional[Any]'') -> ''list[Output]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.abatch
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 0e520b32-3565-428a-9203-cbed5954bd4d
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `abatch_as_completed`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, inputs: ''Sequence[Input]'', config: ''Optional[Union[RunnableConfig,
+    Sequence[RunnableConfig]]]'' = None, *, return_exceptions: ''bool'' = False, **kwargs:
+    ''Optional[Any]'') -> ''AsyncIterator[Tuple[int, Union[Output, Exception]]]''
+    -> (self, inputs: ''Sequence[Input]'', config: ''Optional[Union[RunnableConfig,
+    Sequence[RunnableConfig]]]'' = None, *, return_exceptions: ''bool'' = False, **kwargs:
+    ''Optional[Any]'') -> ''AsyncIterator[tuple[int, Union[Output, Exception]]]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.abatch_as_completed
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 3869e789-872c-475b-8402-a19f448d7692
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `aparse_result`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, result: ''List[Generation]'', *, partial: ''bool'' = False)
+    -> ''T'' -> (self, result: ''list[Generation]'', *, partial: ''bool'' = False)
+    -> ''T'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.aparse_result
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: c2b6334a-f567-4f20-9968-0c2c5e47dc0e
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `assign`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, **kwargs: ''Union[Runnable[Dict[str, Any], Any], Callable[[Dict[str,
+    Any]], Any], Mapping[str, Union[Runnable[Dict[str, Any], Any], Callable[[Dict[str,
+    Any]], Any]]]]'') -> ''RunnableSerializable[Any, Any]'' -> (self, **kwargs: ''Union[Runnable[dict[str,
+    Any], Any], Callable[[dict[str, Any]], Any], Mapping[str, Union[Runnable[dict[str,
+    Any], Any], Callable[[dict[str, Any]], Any]]]]'') -> ''RunnableSerializable[Any,
+    Any]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.assign
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 9380d8d9-e239-4bd7-b0ea-0012295848af
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `as_tool`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, args_schema: ''Optional[Type[BaseModel]]'' = None, *, name:
+    ''Optional[str]'' = None, description: ''Optional[str]'' = None, arg_types: ''Optional[Dict[str,
+    Type]]'' = None) -> ''BaseTool'' -> (self, args_schema: ''Optional[type[BaseModel]]''
+    = None, *, name: ''Optional[str]'' = None, description: ''Optional[str]'' = None,
+    arg_types: ''Optional[dict[str, type]]'' = None) -> ''BaseTool'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.as_tool
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 469b317e-55fe-4882-bae3-a43036c394ce
+  question: I'm upgrading from 0.1 to 0.2 — what changed for `astream_events`?
+  category: migration
+  target_version: '0.2'
+  expected_answer: '(self, input: ''Any'', config: ''Optional[RunnableConfig]'' =
+    None, *, version: "Literal[''v1'']", include_names: ''Optional[Sequence[str]]''
+    = None, include_types: ''Optional[Sequence[str]]'' = None, include_tags: ''Optional[Sequence[str]]''
+    = None, exclude_names: ''Optional[Sequence[str]]'' = None, exclude_types: ''Optional[Sequence[str]]''
+    = None, exclude_tags: ''Optional[Sequence[str]]'' = None, **kwargs: ''Any'') ->
+    ''AsyncIterator[StreamEvent]'' -> (self, input: ''Any'', config: ''Optional[RunnableConfig]''
+    = None, *, version: "Literal[''v1'', ''v2'']", include_names: ''Optional[Sequence[str]]''
+    = None, include_types: ''Optional[Sequence[str]]'' = None, include_tags: ''Optional[Sequence[str]]''
+    = None, exclude_names: ''Optional[Sequence[str]]'' = None, exclude_types: ''Optional[Sequence[str]]''
+    = None, exclude_tags: ''Optional[Sequence[str]]'' = None, **kwargs: ''Any'') ->
+    ''AsyncIterator[StreamEvent]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.astream_events
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: d8a37a05-1f23-4b9d-9091-e58da0884c7d
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `batch`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, inputs: ''List[Input]'', config: ''Optional[Union[RunnableConfig,
+    List[RunnableConfig]]]'' = None, *, return_exceptions: ''bool'' = False, **kwargs:
+    ''Optional[Any]'') -> ''List[Output]'' -> (self, inputs: ''list[Input]'', config:
+    ''Optional[Union[RunnableConfig, list[RunnableConfig]]]'' = None, *, return_exceptions:
+    ''bool'' = False, **kwargs: ''Optional[Any]'') -> ''list[Output]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.batch
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 2872f6dc-b1d2-486b-8888-93dcda354c7e
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `batch_as_completed`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, inputs: ''Sequence[Input]'', config: ''Optional[Union[RunnableConfig,
+    Sequence[RunnableConfig]]]'' = None, *, return_exceptions: ''bool'' = False, **kwargs:
+    ''Optional[Any]'') -> ''Iterator[Tuple[int, Union[Output, Exception]]]'' -> (self,
+    inputs: ''Sequence[Input]'', config: ''Optional[Union[RunnableConfig, Sequence[RunnableConfig]]]''
+    = None, *, return_exceptions: ''bool'' = False, **kwargs: ''Optional[Any]'') ->
+    ''Iterator[tuple[int, Union[Output, Exception]]]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.batch_as_completed
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: e04bab92-b362-402a-915b-79f9d932ba97
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `config_schema`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, *, include: ''Optional[Sequence[str]]'' = None) -> ''Type[BaseModel]''
+    -> (self, *, include: ''Optional[Sequence[str]]'' = None) -> ''type[BaseModel]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.config_schema
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: a9d44cd8-30d6-4543-bc2e-322f3317e016
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `copy`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self: ''Model'', *, include: Union[ForwardRef(''AbstractSetIntStr''),
+    ForwardRef(''MappingIntStrAny''), NoneType] = None, exclude: Union[ForwardRef(''AbstractSetIntStr''),
+    ForwardRef(''MappingIntStrAny''), NoneType] = None, update: Optional[ForwardRef(''DictStrAny'')]
+    = None, deep: bool = False) -> ''Model'' -> (self, *, include: ''AbstractSetIntStr
+    | MappingIntStrAny | None'' = None, exclude: ''AbstractSetIntStr | MappingIntStrAny
+    | None'' = None, update: ''Dict[str, Any] | None'' = None, deep: ''bool'' = False)
+    -> ''Self'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.copy
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: c888dccd-f79c-4833-b38b-8c3f6e0656ba
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `dict`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, **kwargs: ''Any'') -> ''Dict'' -> (self, **kwargs: ''Any'')
+    -> ''dict'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.dict
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 9bc42ad7-6d1c-4a94-a703-9a7242737231
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `get_input_schema`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, config: ''Optional[RunnableConfig]'' = None) -> ''Type[BaseModel]''
+    -> (self, config: ''Optional[RunnableConfig]'' = None) -> ''type[BaseModel]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.get_input_schema
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 6e4e1ec2-86db-41b6-b800-fe6edd80e08d
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `get_output_schema`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, config: ''Optional[RunnableConfig]'' = None) -> ''Type[BaseModel]''
+    -> (self, config: ''Optional[RunnableConfig]'' = None) -> ''type[BaseModel]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.get_output_schema
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 3a21093a-28df-49ea-bf4d-005c8c83ea93
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `get_prompts`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, config: ''Optional[RunnableConfig]'' = None) -> ''List[BasePromptTemplate]''
+    -> (self, config: ''Optional[RunnableConfig]'' = None) -> ''list[BasePromptTemplate]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.get_prompts
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: f38ae710-e5e9-417a-b291-3309c486da81
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `invoke`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, input: ''Union[str, BaseMessage]'', config: ''Optional[RunnableConfig]''
+    = None) -> ''T'' -> (self, input: ''Union[str, BaseMessage]'', config: ''Optional[RunnableConfig]''
+    = None, **kwargs: ''Any'') -> ''T'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.invoke
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: c9fbba43-6ccf-4e56-afaf-5c1293800b1f
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `json`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, *, include: Union[ForwardRef(''AbstractSetIntStr''), ForwardRef(''MappingIntStrAny''),
+    NoneType] = None, exclude: Union[ForwardRef(''AbstractSetIntStr''), ForwardRef(''MappingIntStrAny''),
+    NoneType] = None, by_alias: bool = False, skip_defaults: Optional[bool] = None,
+    exclude_unset: bool = False, exclude_defaults: bool = False, exclude_none: bool
+    = False, encoder: Optional[Callable[[Any], Any]] = None, models_as_dict: bool
+    = True, **dumps_kwargs: Any) -> str -> (self, *, include: ''IncEx | None'' = None,
+    exclude: ''IncEx | None'' = None, by_alias: ''bool'' = False, exclude_unset: ''bool''
+    = False, exclude_defaults: ''bool'' = False, exclude_none: ''bool'' = False, encoder:
+    ''Callable[[Any], Any] | None'' = PydanticUndefined, models_as_dict: ''bool''
+    = PydanticUndefined, **dumps_kwargs: ''Any'') -> ''str'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.json
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: e06717f5-8355-4524-9c4f-cf55ed4c00f2
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `map`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: (self) -> 'Runnable[List[Input], List[Output]]' -> (self) -> 'Runnable[list[Input],
+    list[Output]]'
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.map
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: bc63d083-42b3-463e-b368-834527ef3bf9
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `parse_result`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, result: ''List[Generation]'', *, partial: ''bool'' = False)
+    -> ''T'' -> (self, result: ''list[Generation]'', *, partial: ''bool'' = False)
+    -> ''T'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.parse_result
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: ba300a33-df7c-4d4f-ae03-fc5d5490bd7a
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `pick`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, keys: ''Union[str, List[str]]'') -> ''RunnableSerializable[Any,
+    Any]'' -> (self, keys: ''Union[str, list[str]]'') -> ''RunnableSerializable[Any,
+    Any]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.pick
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: a3305c76-2a0f-4325-b101-9f16eadf9350
+  question: I'm upgrading from 0.1 to 0.2 — what changed for `to_json`?
+  category: migration
+  target_version: '0.2'
+  expected_answer: (self) -> Union[langchain_core.load.serializable.SerializedConstructor,
+    langchain_core.load.serializable.SerializedNotImplemented] -> (self) -> 'Union[SerializedConstructor,
+    SerializedNotImplemented]'
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.to_json
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: e6f94ab5-8494-428d-a685-563970b12a89
+  question: I'm upgrading from 0.2 to 0.3 — what changed for `with_fallbacks`?
+  category: migration
+  target_version: '0.3'
+  expected_answer: '(self, fallbacks: ''Sequence[Runnable[Input, Output]]'', *, exceptions_to_handle:
+    ''Tuple[Type[BaseException], ...]'' = (<class ''Exception''>,), exception_key:
+    ''Optional[str]'' = None) -> ''RunnableWithFallbacksT[Input, Output]'' -> (self,
+    fallbacks: ''Sequence[Runnable[Input, Output]]'', *, exceptions_to_handle: ''tuple[type[BaseException],
+    ...]'' = (<class ''Exception''>,), exception_key: ''Optional[str]'' = None) ->
+    ''RunnableWithFallbacksT[Input, Output]'''
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.with_fallbacks
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: e486273d-6e0c-416d-a17d-e94a9fe0c28e
+  question: What happened to `model_copy`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentExecutor.model_copy` was removed
+    going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.model_copy
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 91a556dc-e3f5-4a5d-9d7a-a647190d6227
+  question: What happened to `model_dump`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentExecutor.model_dump` was removed
+    going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.model_dump
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 39ca950b-303b-4b63-a996-88878dc59690
+  question: What happened to `model_dump_json`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentExecutor.model_dump_json` was removed
+    going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.model_dump_json
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: e2a99cfc-0896-4b19-8996-8ea0decb66a2
+  question: What happened to `model_post_init`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentExecutor.model_post_init` was removed
+    going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.model_post_init
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 830ddca5-8fab-4539-88d5-2c98ab888cb7
+  question: What happened to `pipe`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentExecutor.pipe` was removed going
+    from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.pipe
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 8ae09a63-fb56-4235-b761-7735fee47dad
+  question: What happened to `prep_inputs`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentExecutor.prep_inputs` was removed
+    going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.prep_inputs
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 80354a9a-1520-46b0-8fa9-c6b1e2b0687f
+  question: What happened to `prep_outputs`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentExecutor.prep_outputs` was removed
+    going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.prep_outputs
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 4cc85b6b-c415-4225-8226-d1d21e23d44e
+  question: What happened to `save`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentExecutor.save` was removed going
+    from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.save
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: b89f1ec8-aca1-464d-8d3c-e463ad22829e
+  question: What happened to `save_agent`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentExecutor.save_agent` was removed
+    going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.save_agent
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 719815da-ef6b-46a5-a265-7f6da50c55dd
+  question: What happened to `stream`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentExecutor.stream` was removed going
+    from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.stream
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: aecb0bb3-b525-421e-823c-81e0c2f76a7b
+  question: What happened to `to_json_not_implemented`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentExecutor.to_json_not_implemented`
+    was removed going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.to_json_not_implemented
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 8e49eac9-b03d-46c1-9a62-c7a4bce33013
+  question: What happened to `transform`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentExecutor.transform` was removed going
+    from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.transform
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: b677d223-2377-4cd6-88f3-76ca91fc289a
+  question: What happened to `validate_tools`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentExecutor.validate_tools` was removed
+    going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.validate_tools
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: f40e561f-62de-41c0-a771-0d22e345189a
+  question: What happened to `with_alisteners`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentExecutor.with_alisteners` was removed
+    going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.with_alisteners
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 1ba903d8-eeee-457a-85fb-d3dbe878d760
+  question: What happened to `with_config`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentExecutor.with_config` was removed
+    going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentExecutor.with_config
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: ca8303bc-23c8-46d1-8f98-aa6fb1ab5208
+  question: What happened to `get_allowed_tools`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.Agent.get_allowed_tools` was removed going
+    from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.Agent.get_allowed_tools
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: f792b336-efee-4265-905f-33bb694aa741
+  question: What happened to `get_full_inputs`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.Agent.get_full_inputs` was removed going
+    from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.Agent.get_full_inputs
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 79b7e193-efc2-4814-a1fc-653bf611b724
+  question: What happened to `model_copy`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.Agent.model_copy` was removed going from
+    0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.Agent.model_copy
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 1a520f95-4afa-4f41-a6b6-7c8acb63b566
+  question: What happened to `model_dump`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.Agent.model_dump` was removed going from
+    0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.Agent.model_dump
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: cf08190f-a336-452a-924e-8ca749a9f6cf
+  question: What happened to `model_dump_json`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.Agent.model_dump_json` was removed going
+    from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.Agent.model_dump_json
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 5de02803-f3e2-4eb8-ac45-f0cab96ccb9b
+  question: What happened to `model_post_init`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.Agent.model_post_init` was removed going
+    from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.Agent.model_post_init
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 46cee0e1-8373-44b7-892c-c331bf169769
+  question: What happened to `ainvoke`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentOutputParser.ainvoke` was removed
+    going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.ainvoke
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 1e078b01-4d89-40bc-a500-edfc1bfd5dc9
+  question: What happened to `aparse`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentOutputParser.aparse` was removed
+    going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.aparse
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: fdaa2a7a-bc6f-481f-b1c1-60ed671e5e01
+  question: What happened to `astream`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentOutputParser.astream` was removed
+    going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.astream
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 878c4ce5-a076-4f9c-b3a8-0869d0b1c468
+  question: What happened to `astream_log`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentOutputParser.astream_log` was removed
+    going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.astream_log
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: fbd75c18-73d9-4b9f-9f7d-33e114381ca3
+  question: What happened to `atransform`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentOutputParser.atransform` was removed
+    going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.atransform
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: d19c719a-bbe3-4b33-a9c3-257e893a3af6
+  question: What happened to `bind`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentOutputParser.bind` was removed going
+    from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.bind
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 721092c3-eb74-4141-b7e7-37d0aefd9839
+  question: What happened to `configurable_alternatives`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentOutputParser.configurable_alternatives`
+    was removed going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.configurable_alternatives
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 370be2cd-b1a7-467b-a4d8-7eaf9e30fa87
+  question: What happened to `configurable_fields`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentOutputParser.configurable_fields`
+    was removed going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.configurable_fields
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 86c6d568-9eaa-4afc-9386-a8d12856ca78
+  question: What happened to `get_config_jsonschema`? Can I still use it in 1.4.0?
+  category: removed_api
+  target_version: 1.4.0
+  expected_answer: '`langchain.agents.agent.AgentOutputParser.get_config_jsonschema`
+    was removed going from 0.3 to 1.4.0. No replacement was recorded.'
+  expected_symbols:
+  - langchain.agents.agent.AgentOutputParser.get_config_jsonschema
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 2354a1d0-ba17-463b-8d44-f793b36421b2
+  question: Does LangChain still have `create_agent`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.factory.create_agent` is available in the
+    current version (1.4.0). Creates an agent graph that calls tools in a loop until
+    a stopping condition is met.
+  expected_symbols:
+  - langchain.agents.factory.create_agent
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 2c2f4f93-511b-47c6-af84-6bcef00fdf83
+  question: Does LangChain still have `ClearToolUsesEdit`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ClearToolUsesEdit`
+    is available in the current version (1.4.0). Configuration for clearing tool outputs
+    when token limits are exceeded.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ClearToolUsesEdit
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: eb908155-8afc-4af9-aee7-70925f6beaeb
+  question: Does LangChain still have `apply`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ClearToolUsesEdit.apply`
+    is available in the current version (1.4.0). Apply the clear-tool-uses strategy.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ClearToolUsesEdit.apply
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: ffed2ba5-171e-4b3c-8e89-d01e3bf0baca
+  question: Does LangChain still have `ContextEdit`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ContextEdit`
+    is available in the current version (1.4.0). Protocol describing a context editing
+    strategy.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ContextEdit
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 98528c10-bd12-4d21-8c6e-8db18e05dac5
+  question: Does LangChain still have `apply`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ContextEdit.apply`
+    is available in the current version (1.4.0). Apply an edit to the message list
+    in place.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ContextEdit.apply
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 7a7a79a5-44a0-45cc-88f0-9b5c612cf628
+  question: Does LangChain still have `ContextEditingMiddleware`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ContextEditingMiddleware`
+    is available in the current version (1.4.0). Automatically prune tool results
+    to manage context size.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ContextEditingMiddleware
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: d3a58161-f51f-4453-9100-f7eacfaa9dce
+  question: Does LangChain still have `aafter_agent`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ContextEditingMiddleware.aafter_agent`
+    is available in the current version (1.4.0). Async logic to run after the agent
+    execution completes.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ContextEditingMiddleware.aafter_agent
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 13ba009b-a725-4c11-acfe-38ef86e0f947
+  question: Does LangChain still have `aafter_model`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ContextEditingMiddleware.aafter_model`
+    is available in the current version (1.4.0). Async logic to run after the model
+    is called.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ContextEditingMiddleware.aafter_model
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 006398ea-b747-45ac-8927-d11a944ea8b1
+  question: Does LangChain still have `abefore_agent`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ContextEditingMiddleware.abefore_agent`
+    is available in the current version (1.4.0). Async logic to run before the agent
+    execution starts.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ContextEditingMiddleware.abefore_agent
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: bf159c6f-5d30-4209-b1bc-5b7a7f2911d2
+  question: Does LangChain still have `abefore_model`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ContextEditingMiddleware.abefore_model`
+    is available in the current version (1.4.0). Async logic to run before the model
+    is called.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ContextEditingMiddleware.abefore_model
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: b4498bfc-699a-47c2-a283-a7a4e75d898f
+  question: Does LangChain still have `after_agent`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ContextEditingMiddleware.after_agent`
+    is available in the current version (1.4.0). Logic to run after the agent execution
+    completes.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ContextEditingMiddleware.after_agent
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: f4ec88b6-c948-4d61-ab92-901ba244798f
+  question: Does LangChain still have `after_model`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ContextEditingMiddleware.after_model`
+    is available in the current version (1.4.0). Logic to run after the model is called.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ContextEditingMiddleware.after_model
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 8ea46342-f5d5-46de-9a57-ba451b855b91
+  question: Does LangChain still have `awrap_model_call`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ContextEditingMiddleware.awrap_model_call`
+    is available in the current version (1.4.0). Apply context edits before invoking
+    the model via handler.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ContextEditingMiddleware.awrap_model_call
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: ecc50d71-feff-4325-95ec-f3e0ea79e84b
+  question: Does LangChain still have `awrap_tool_call`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ContextEditingMiddleware.awrap_tool_call`
+    is available in the current version (1.4.0). Intercept and control async tool
+    execution via handler callback.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ContextEditingMiddleware.awrap_tool_call
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: de859e64-7eaf-446d-abc6-4d4e93463f8e
+  question: Does LangChain still have `before_agent`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ContextEditingMiddleware.before_agent`
+    is available in the current version (1.4.0). Logic to run before the agent execution
+    starts.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ContextEditingMiddleware.before_agent
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: bf3150d1-0b4b-46e9-97eb-e464e7be6794
+  question: Does LangChain still have `before_model`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ContextEditingMiddleware.before_model`
+    is available in the current version (1.4.0). Logic to run before the model is
+    called.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ContextEditingMiddleware.before_model
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: f59f4973-46b8-450b-a1fd-474252c52447
+  question: Does LangChain still have `wrap_model_call`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ContextEditingMiddleware.wrap_model_call`
+    is available in the current version (1.4.0). Apply context edits before invoking
+    the model via handler.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ContextEditingMiddleware.wrap_model_call
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: c2a79a8f-56e2-45a0-813c-12dfcd480ecb
+  question: Does LangChain still have `wrap_tool_call`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.context_editing.ContextEditingMiddleware.wrap_tool_call`
+    is available in the current version (1.4.0). Intercept tool execution for retries,
+    monitoring, or modification.
+  expected_symbols:
+  - langchain.agents.middleware.context_editing.ContextEditingMiddleware.wrap_tool_call
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 56af154c-761d-4672-844c-62474a81362a
+  question: Does LangChain still have `BaseExecutionPolicy`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware._execution.BaseExecutionPolicy`
+    is available in the current version (1.4.0). Configuration contract for persistent
+    shell sessions.
+  expected_symbols:
+  - langchain.agents.middleware._execution.BaseExecutionPolicy
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: d42e2f0c-384f-458b-95d0-bbfb5b4be6f6
+  question: Does LangChain still have `spawn`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware._execution.BaseExecutionPolicy.spawn`
+    is available in the current version (1.4.0). Launch the persistent shell process.
+  expected_symbols:
+  - langchain.agents.middleware._execution.BaseExecutionPolicy.spawn
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: b6c58e3a-540e-4da9-838e-5a958b124591
+  question: Does LangChain still have `CodexSandboxExecutionPolicy`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware._execution.CodexSandboxExecutionPolicy`
+    is available in the current version (1.4.0). Launch the shell through the Codex
+    CLI sandbox.
+  expected_symbols:
+  - langchain.agents.middleware._execution.CodexSandboxExecutionPolicy
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 64f2fcf2-d9ac-4eee-b0dc-d28e038d2287
+  question: Does LangChain still have `spawn`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware._execution.CodexSandboxExecutionPolicy.spawn`
+    is available in the current version (1.4.0). Launch the persistent shell process.
+  expected_symbols:
+  - langchain.agents.middleware._execution.CodexSandboxExecutionPolicy.spawn
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: c7198cd4-e457-48a2-aac4-2410b9aa3be5
+  question: Does LangChain still have `DockerExecutionPolicy`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware._execution.DockerExecutionPolicy`
+    is available in the current version (1.4.0). Run the shell inside a dedicated
+    Docker container.
+  expected_symbols:
+  - langchain.agents.middleware._execution.DockerExecutionPolicy
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: a3501b9c-cbfe-4b58-bbf8-5ae4d1ef55e7
+  question: Does LangChain still have `spawn`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware._execution.DockerExecutionPolicy.spawn`
+    is available in the current version (1.4.0). Launch the persistent shell process.
+  expected_symbols:
+  - langchain.agents.middleware._execution.DockerExecutionPolicy.spawn
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 8ff7d235-d327-4209-b8b5-32c1839d33ac
+  question: Does LangChain still have `HostExecutionPolicy`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware._execution.HostExecutionPolicy`
+    is available in the current version (1.4.0). Run the shell directly on the host
+    process.
+  expected_symbols:
+  - langchain.agents.middleware._execution.HostExecutionPolicy
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 4fb4c6f6-b731-4983-9bc4-1ac52d51b15a
+  question: Does LangChain still have `spawn`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware._execution.HostExecutionPolicy.spawn`
+    is available in the current version (1.4.0). Launch the persistent shell process.
+  expected_symbols:
+  - langchain.agents.middleware._execution.HostExecutionPolicy.spawn
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 1187d164-e4d7-47f0-92fc-9c8da837ada5
+  question: Does LangChain still have `FilesystemFileSearchMiddleware`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.file_search.FilesystemFileSearchMiddleware`
+    is available in the current version (1.4.0). Provides Glob and Grep search over
+    filesystem files.
+  expected_symbols:
+  - langchain.agents.middleware.file_search.FilesystemFileSearchMiddleware
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 1883c700-2fab-467a-92e1-ba6c56b11f89
+  question: Does LangChain still have `aafter_agent`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.file_search.FilesystemFileSearchMiddleware.aafter_agent`
+    is available in the current version (1.4.0). Async logic to run after the agent
+    execution completes.
+  expected_symbols:
+  - langchain.agents.middleware.file_search.FilesystemFileSearchMiddleware.aafter_agent
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: b9c32148-a66e-45a0-b378-8a1b81d6e2f5
+  question: Does LangChain still have `aafter_model`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.file_search.FilesystemFileSearchMiddleware.aafter_model`
+    is available in the current version (1.4.0). Async logic to run after the model
+    is called.
+  expected_symbols:
+  - langchain.agents.middleware.file_search.FilesystemFileSearchMiddleware.aafter_model
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: 36d88d3a-f29e-4f8a-ac1b-e75551ea7446
+  question: Does LangChain still have `abefore_agent`?
+  category: version_implicit
+  target_version: 1.4.0
+  expected_answer: Yes — `langchain.agents.middleware.file_search.FilesystemFileSearchMiddleware.abefore_agent`
+    is available in the current version (1.4.0). Async logic to run before the agent
+    execution starts.
+  expected_symbols:
+  - langchain.agents.middleware.file_search.FilesystemFileSearchMiddleware.abefore_agent
+  should_abstain: false
+  reviewed: false
+  reviewer_note: null
+- id: c445c868-123e-44a6-920a-2065e3d4595f
+  question: How do I configure a Kubernetes ingress controller?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: 0d3a3770-5d68-4ee7-b399-0caf56355934
+  question: What's the correct syntax for a Rust match statement?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: 291044c5-f451-4cd3-bbd4-81b8159fb325
+  question: How do I set up a MySQL replication cluster?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: 26d1fb42-b314-4229-9e18-ccc315b8ab0e
+  question: What's the best way to deploy a React Native app to the App Store?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: ccad1a3d-a1c5-4bbf-8b1f-5c1c399b2387
+  question: How do I write a device driver for a USB webcam on Linux?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: 0a3e9cfb-f7c0-4aca-adbe-6e35cbdaaa8e
+  question: What's the time complexity of quicksort in the worst case?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: 83912bfc-25d4-48b4-afc1-5a5952f31f55
+  question: How do I configure OAuth2 for a Django REST Framework project?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: 70d8f6e5-2b17-4526-bb8c-a28c6d202e7c
+  question: What's the difference between TCP and UDP handshakes?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: 3bf7ef29-b92b-4bd7-b2c2-e5af227a7b62
+  question: How do I set up a Terraform module for an AWS VPC?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: 8512b9b9-95ac-484e-b068-61de20e68ea2
+  question: What's the correct way to use goroutines and channels in Go?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: 2d0715b6-a58b-4af3-99f2-6aeb40c779f0
+  question: Does LangChain provide `create_supervisor_agent`?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: 44770bd4-70a3-4910-a2d8-fad39436cfe9
+  question: Does LangChain provide `SelfCorrectingChain`?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: e4c37657-1f63-448a-837c-6bcc6333770d
+  question: Does LangChain provide `QuantumMemory`?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: a09e1f06-3845-42ab-bce0-f90785fc886b
+  question: Does LangChain provide `AutoBrowserTool`?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: 51d1493c-c9b9-4e4f-85dc-7d613300a1ca
+  question: Does LangChain provide `NeuralSymbolicRetriever`?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: 478ad142-ee37-4d99-87ab-0ab18bb6285c
+  question: Does LangChain provide `YAMLStrictParser`?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: 6883e6d6-ba4a-40c6-8205-4f0a59488733
+  question: Does LangChain provide `load_secure_tools`?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: c31b41d0-36c5-4f7a-b41a-4d7300cf8903
+  question: Does LangChain provide `astream_batch`?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: 97b4de0f-d898-45fa-ae09-287f4a91d77a
+  question: Does LangChain provide `QuantizedEmbeddings`?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
+- id: 7615d781-6359-4bc8-81f0-2e851c52f4e7
+  question: Does LangChain provide `SlackNotifierCallback`?
+  category: unanswerable
+  target_version: null
+  expected_answer: null
+  expected_symbols: []
+  should_abstain: true
+  reviewed: false
+  reviewer_note: null
