@@ -89,22 +89,40 @@ def golden_set_load_cmd(path: Path = Path("data/golden_set.yaml")) -> None:
 
 
 @golden_set_app.command("show")
-def golden_set_show_cmd(identifier: str, path: Path = Path("data/golden_set.yaml")) -> None:
+def golden_set_show_cmd(
+    identifier: str = typer.Argument(None),
+    path: Path = Path("data/golden_set.yaml"),
+) -> None:
     """Print one golden-set row plus the real timeline for its symbols, so
     reviewing a question and checking its evidence doesn't require manually
-    cross-referencing the YAML file against `versed timeline`.
+    cross-referencing the YAML file against `versed timeline`. With no
+    identifier, jumps to the first not-yet-reviewed row.
     """
     questions = read_golden_set(path)
 
+    index: int | None = None
     match = None
-    if identifier.isdigit() and int(identifier) < len(questions):
-        match = questions[int(identifier)]
+    if identifier is None:
+        for i, q in enumerate(questions):
+            if not q.reviewed:
+                index, match = i, q
+                break
+        else:
+            typer.echo("All questions are reviewed.")
+            return
+    elif identifier.isdigit() and int(identifier) < len(questions):
+        index = int(identifier)
+        match = questions[index]
     else:
-        match = next((q for q in questions if str(q.id) == identifier), None)
+        for i, q in enumerate(questions):
+            if str(q.id) == identifier:
+                index, match = i, q
+                break
     if match is None:
         typer.echo(f"No question found for '{identifier}' (tried index and id)")
         raise typer.Exit(code=1)
 
+    typer.echo(f"#{index} id={match.id} reviewed={match.reviewed}")
     typer.echo(f"[{match.category}] {match.question}")
     if match.target_version:
         typer.echo(f"target_version: {match.target_version}")
